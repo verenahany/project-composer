@@ -24,6 +24,7 @@ export interface ChatbotConfig {
     showAvatar: boolean
     showInput: boolean
     showTimestamps: boolean
+    showMic: boolean
   }
 }
 
@@ -68,6 +69,7 @@ export function createDefaultConfig(): ProjectConfig {
         showAvatar: true,
         showInput: true,
         showTimestamps: true,
+        showMic: false,
       },
     },
     icons: { ...DEFAULT_ICONS },

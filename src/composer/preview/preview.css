@@ -463,3 +463,62 @@
   color: var(--composer-primary-foreground, #ffffff);
   cursor: default;
 }
+
+/* ── Presentation AI chat input bar ───────────────────────────────── */
+
+.prev-chat__pres-input-bar {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--composer-border);
+  border-radius: 0 0 8px 8px;
+  background: var(--composer-muted, #f7f5fa);
+}
+
+.prev-chat__pres-textarea {
+  width: 100%;
+  min-height: 36px;
+  max-height: 80px;
+  resize: none;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--composer-foreground);
+  outline: none;
+}
+
+.prev-chat__pres-textarea::placeholder {
+  color: var(--composer-muted-foreground);
+}
+
+.prev-chat__pres-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 4px 10px 8px;
+}
+
+.prev-chat__pres-mic,
+.prev-chat__pres-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--composer-border);
+  cursor: default;
+}
+
+.prev-chat__pres-mic {
+  background: var(--composer-card, #fff);
+  color: var(--composer-foreground);
+}
+
+.prev-chat__pres-send {
+  background: var(--composer-card, #fff);
+  color: var(--composer-foreground);
+  border-color: var(--composer-border);
+}

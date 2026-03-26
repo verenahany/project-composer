@@ -5,7 +5,7 @@
  */
 
 import type { FC } from 'react'
-import { MessageCircle, Send, Bot, User } from 'lucide-react'
+import { MessageCircle, Send, Bot, User, MicOff } from 'lucide-react'
 import type { ChatbotConfig } from '../config/schema'
 
 interface Props {
@@ -139,10 +139,77 @@ function SupportChat({ chatbotConfig }: Props) {
   )
 }
 
+function PresentationChat({ chatbotConfig }: Props) {
+  const { props } = chatbotConfig
+
+  const presMessages = [
+    { id: 1, role: 'assistant' as const, text: 'How can I help you today?' },
+    { id: 2, role: 'user' as const, text: 'I need a presentation about AI trends in 2026.' },
+    { id: 3, role: 'assistant' as const, text: "Great topic! I'll cover the latest developments in generative AI, autonomous agents, and multimodal models. How many slides would you like?" },
+    { id: 4, role: 'user' as const, text: 'Around 12 slides, keep it concise.' },
+  ]
+
+  return (
+    <div className="prev-chat prev-chat--presentation">
+      {props.showHeader && (
+        <div className="prev-chat__header">
+          <Bot size={16} />
+          <span>Presentation AI</span>
+          <span className="prev-chat__status-dot" />
+        </div>
+      )}
+      <div className="prev-chat__messages">
+        {presMessages.map((msg) => (
+          <div key={msg.id} className={`prev-chat__row prev-chat__row--${msg.role}`}>
+            {props.showAvatar && (
+              <span className={`prev-chat__avatar prev-chat__avatar--${msg.role === 'assistant' ? 'bot' : 'user'}`}>
+                {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+              </span>
+            )}
+            <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
+              <p>{msg.text}</p>
+            </div>
+          </div>
+        ))}
+        {/* Streaming dots */}
+        <div className="prev-chat__row prev-chat__row--assistant">
+          {props.showAvatar && (
+            <span className="prev-chat__avatar prev-chat__avatar--bot"><Bot size={14} /></span>
+          )}
+          <div className="prev-chat__bubble prev-chat__bubble--assistant prev-chat__bubble--typing">
+            <span className="prev-chat__dots"><span /><span /><span /></span>
+          </div>
+        </div>
+      </div>
+      {props.showInput && (
+        <div className="prev-chat__pres-input-bar">
+          <textarea
+            className="prev-chat__pres-textarea"
+            placeholder="Message AI..."
+            rows={1}
+            readOnly
+          />
+          <div className="prev-chat__pres-actions">
+            {props.showMic && (
+              <button className="prev-chat__pres-mic" title="Voice input">
+                <MicOff size={14} />
+              </button>
+            )}
+            <button className="prev-chat__pres-send" title="Send">
+              <Send size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const CHATBOT_COMPONENTS: Record<string, FC<Props>> = {
   'chatbot-haive': HaiveChat,
   'chatbot-bubbles': BubblesChat,
   'chatbot-support': SupportChat,
+  'chatbot-presentation': PresentationChat,
 }
 
 export default function PreviewChatbot({ chatbotConfig }: Props) {

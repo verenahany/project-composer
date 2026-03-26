@@ -50,13 +50,27 @@ export const chatbotRegistry: ChatbotEntry[] = [
     id: 'chatbot-support',
     displayName: 'Support Assistant',
     description:
-      'AI-style assistant chat with streaming dots, markdown rendering, and action buttons. Inspired by Presentation AI dashboard chat.',
-    source: 'presentation-ai/PresentationDashboard.tsx',
+      'AI-style assistant chat with streaming dots, markdown rendering, and action buttons.',
+    source: 'custom',
     configurableProps: [
       { key: 'showHeader', label: 'Show Header', type: 'boolean', defaultValue: true },
       { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
       { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: true },
       { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: false },
+    ],
+  },
+  {
+    id: 'chatbot-presentation',
+    displayName: 'Presentation AI Chat',
+    description:
+      'Full chat UI from Presentation AI with auto-growing input, microphone voice-to-text (Web Speech API), send button, streaming dots, and rounded message bubbles.',
+    source: 'presentation-ai/PresentationInput.tsx + PresentationDashboard.tsx',
+    configurableProps: [
+      { key: 'showHeader', label: 'Show Header', type: 'boolean', defaultValue: true },
+      { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
+      { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: true },
+      { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: false },
+      { key: 'showMic', label: 'Show Mic Button', type: 'boolean', defaultValue: true },
     ],
   },
 ]
