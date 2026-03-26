@@ -6,18 +6,19 @@
  *   Center: live preview canvas
  *   Right:  properties & icon toggles
  *
- * Toolbar: project name, save/load, reset, generate/export
+ * Toolbar: save/load, export/import, reset, push to GitHub
  */
 
-import { useRef, type ChangeEvent } from 'react'
-import { Download, Upload, RotateCcw, FolderOutput, Save } from 'lucide-react'
+import { useState, useRef, type ChangeEvent } from 'react'
+import { Download, Upload, RotateCcw, Save, Github } from 'lucide-react'
 import { useComposerStore } from './state/useComposerStore'
 import { ComposerProvider } from './state/ComposerContext'
 import ComponentPanel from './panels/ComponentPanel'
 import PreviewPanel from './panels/PreviewPanel'
 import PropertiesPanel from './panels/PropertiesPanel'
+import GitHubModal from './components/GitHubModal'
 import { saveConfigToStorage, loadConfigFromStorage, STORAGE_KEY } from './generator/persistence'
-import { exportConfigAsJson, generateProjectZip } from './generator/generate-project'
+import { exportConfigAsJson } from './generator/generate-project'
 import type { ProjectConfig } from './config/schema'
 import './composer.css'
 import './preview/preview.css'
@@ -25,6 +26,7 @@ import './preview/preview.css'
 function ComposerInner() {
   const store = useComposerStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [ghModalOpen, setGhModalOpen] = useState(false)
 
   const handleSave = () => {
     saveConfigToStorage(store.config)
@@ -58,10 +60,6 @@ function ComposerInner() {
     }
     reader.readAsText(file)
     e.target.value = ''
-  }
-
-  const handleGenerate = () => {
-    generateProjectZip(store.config)
   }
 
   const hasSaved = !!localStorage.getItem(STORAGE_KEY)
@@ -107,9 +105,9 @@ function ComposerInner() {
               <RotateCcw size={15} />
               <span>Reset</span>
             </button>
-            <button className="composer__btn composer__btn--primary" onClick={handleGenerate} title="Generate project">
-              <FolderOutput size={15} />
-              <span>Generate</span>
+            <button className="composer__btn composer__btn--github" onClick={() => setGhModalOpen(true)} title="Push project to GitHub">
+              <Github size={15} />
+              <span>Push to GitHub</span>
             </button>
           </div>
         </header>
@@ -127,6 +125,12 @@ function ComposerInner() {
           </aside>
         </div>
       </div>
+
+      <GitHubModal
+        config={store.config}
+        open={ghModalOpen}
+        onClose={() => setGhModalOpen(false)}
+      />
     </ComposerProvider>
   )
 }
