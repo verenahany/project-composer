@@ -17,16 +17,19 @@ import { buildComponentsCss } from './templates/components-css-template'
 export interface GeneratedFile {
   path: string
   content: string
+  /** If true, content is already base64-encoded binary */
+  binary?: boolean
 }
 
-export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
+export async function buildProjectFiles(config: ProjectConfig): Promise<GeneratedFile[]> {
   const theme = getThemeById(config.themeId)
   const sidebar = getSidebarById(config.sidebar.componentId)
   const chatbot = getChatbotById(config.chatbot.componentId)
   const activeIcons = iconRegistry.filter((ic) => config.icons[ic.id])
 
+  const logoFileName = theme?.logo.fileName ?? 'logo.png'
+
   const files: GeneratedFile[] = [
-    // Root config files
     { path: 'package.json', content: buildPackageJson(config) },
     { path: 'tsconfig.json', content: TSCONFIG },
     { path: 'vite.config.ts', content: VITE_CONFIG },
@@ -35,19 +38,29 @@ export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
     { path: 'project-config.json', content: JSON.stringify(config, null, 2) },
     { path: 'README.md', content: buildReadme(config, theme, sidebar?.displayName, chatbot?.displayName) },
 
-    // Source files
     { path: 'src/main.tsx', content: MAIN_TSX },
     { path: 'src/App.tsx', content: buildAppComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
     { path: 'src/App.css', content: buildComponentsCss() },
-
-    // Theme
     { path: 'src/theme.css', content: buildThemeCss(theme) },
 
-    // Components
     { path: 'src/components/Logo.tsx', content: buildLogoComponent(theme) },
     { path: 'src/components/Sidebar.tsx', content: buildSidebarComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
     { path: 'src/components/Chatbot.tsx', content: buildChatbotComponent(config) },
   ]
+
+  // Fetch the logo image and include it as a binary file in public/
+  if (theme) {
+    try {
+      const logoBase64 = await fetchAsBase64(theme.logo.url)
+      files.push({
+        path: `public/${logoFileName}`,
+        content: logoBase64,
+        binary: true,
+      })
+    } catch {
+      // If the logo can't be fetched, skip it
+    }
+  }
 
   return files
 }
@@ -55,6 +68,25 @@ export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
 export function exportConfigAsJson(config: ProjectConfig): void {
   const json = JSON.stringify(config, null, 2)
   downloadFile(config.projectName + '-config.json', json, 'application/json')
+}
+
+/**
+ * Fetch a URL (served from public/) and return the content as a base64 string.
+ */
+async function fetchAsBase64(url: string): Promise<string> {
+  const res = await fetch(url)
+  const blob = await res.blob()
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string
+      const base64 = dataUrl.split(',')[1]
+      if (base64) resolve(base64)
+      else reject(new Error('Failed to encode file'))
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
 }
 
 // ── Static file contents ─────────────────────────────────────────────
@@ -182,20 +214,15 @@ ${icons}
 }
 
 function buildLogoComponent(theme: ThemeEntry | undefined): string {
-  if (!theme) {
-    return `export default function Logo() {
-  return <span style={{ fontWeight: 700, fontSize: 16 }}>Logo</span>
-}
-`
-  }
-  const escapedSvg = theme.logo.svg.replace(/`/g, '\\`').replace(/\$/g, '\\$')
-  const w = Math.round(theme.logo.width * 0.75)
-  const h = Math.round(theme.logo.height * 0.75)
+  const fileName = theme?.logo.fileName ?? 'logo.png'
+  const w = theme?.logo.width ?? 100
+  const h = theme?.logo.height ?? 40
   return `export default function Logo() {
   return (
-    <span
-      dangerouslySetInnerHTML={{ __html: \`${escapedSvg}\` }}
-      style={{ display: 'inline-flex', width: ${w}, height: ${h} }}
+    <img
+      src="/${fileName}"
+      alt="Logo"
+      style={{ width: ${w}, height: ${h}, objectFit: 'contain' }}
     />
   )
 }

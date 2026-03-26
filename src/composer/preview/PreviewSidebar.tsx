@@ -30,10 +30,11 @@ interface Props {
 function LogoRenderer({ logo }: { logo?: ThemeLogo }) {
   if (!logo) return null
   return (
-    <span
+    <img
       className="prev-logo"
-      dangerouslySetInnerHTML={{ __html: logo.svg }}
-      style={{ display: 'inline-flex', width: logo.width * 0.7, height: logo.height * 0.7 }}
+      src={logo.url}
+      alt="Logo"
+      style={{ width: logo.width, height: logo.height, objectFit: 'contain' }}
     />
   )
 }

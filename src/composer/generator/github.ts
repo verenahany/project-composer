@@ -122,9 +122,9 @@ export async function pushToGitHub(
       return { success: false, error: 'Repository created but initial commit not ready. Please try again.' }
     }
 
-    // 4. Build all project files
+    // 4. Build all project files (async — fetches logo image)
     log('Generating project files...')
-    const files = buildProjectFiles(config)
+    const files = await buildProjectFiles(config)
 
     // 5. Create blobs for each file
     log(`Uploading ${files.length} files...`)
@@ -132,10 +132,13 @@ export async function pushToGitHub(
 
     for (const file of files) {
       log(`  uploading ${file.path}`)
+      const base64Content = file.binary
+        ? file.content
+        : btoa(unescape(encodeURIComponent(file.content)))
       const blobRes = await ghFetch(`/repos/${owner}/${repoName}/git/blobs`, token, {
         method: 'POST',
         body: JSON.stringify({
-          content: btoa(unescape(encodeURIComponent(file.content))),
+          content: base64Content,
           encoding: 'base64',
         }),
       })

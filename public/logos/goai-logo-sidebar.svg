@@ -1,0 +1,15 @@
+<svg width="110" height="35" viewBox="0 0 110 35" xmlns="http://www.w3.org/2000/svg">
+  <!-- GoAI Text -->
+  <text x="0" y="26" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#000000">GoAI</text>
+  
+  <!-- Two blue arrow shapes to the right (corner bracket style, rotated ~45 degrees) -->
+  <g transform="translate(55, 2)">
+    <!-- First arrow (upper) - corner bracket pointing up-right -->
+    <path d="M 0 8 L 8 0" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 0 0 L 8 0" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Second arrow (lower, slightly offset left and below) - corner bracket pointing up-right -->
+    <path d="M -2 12 L 6 4" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M -2 4 L 6 4" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

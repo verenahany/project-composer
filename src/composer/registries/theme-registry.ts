@@ -5,6 +5,9 @@
  *   - insta_sentiment/frontend/src/styles/tokens.css  (Instapay Purple)
  *   - GoAi-one/frontend/src/index.css                 (GoAI Blue)
  *   - presentation-ai-main/src/styles/theme.css       (E&and Red, GoAI247 Blue)
+ *
+ * Logos are the actual image files from each source repo,
+ * copied into public/logos/ for the preview.
  */
 
 export interface ThemeTokens {
@@ -29,8 +32,13 @@ export interface ThemeTokens {
 }
 
 export interface ThemeLogo {
-  svg: string
+  /** URL path relative to public root, served by Vite (e.g. /logos/instapaylogo.png) */
+  url: string
+  /** The filename used in generated projects (e.g. instapaylogo.png) */
+  fileName: string
+  /** Display width for the logo in the sidebar */
   width: number
+  /** Display height for the logo in the sidebar */
   height: number
 }
 
@@ -47,63 +55,6 @@ export interface ThemeEntry {
   }
 }
 
-// ── Inline SVG logos from each source repo ───────────────────────────
-
-const LOGO_INSTAPAY: ThemeLogo = {
-  width: 130,
-  height: 30,
-  svg: `<svg xmlns="http://www.w3.org/2000/svg" width="130" height="30" viewBox="0 0 130 30">
-  <circle cx="13" cy="15" r="11" fill="#512772"/>
-  <text x="9" y="20" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#fff">I</text>
-  <text x="28" y="21" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="currentColor">Instapay</text>
-</svg>`,
-}
-
-const LOGO_GOAI: ThemeLogo = {
-  width: 110,
-  height: 35,
-  svg: `<svg xmlns="http://www.w3.org/2000/svg" width="110" height="35" viewBox="0 0 110 35">
-  <text x="0" y="26" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="currentColor">GoAI</text>
-  <g transform="translate(55,2)">
-    <path d="M0 8 L8 0" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M0 0 L8 0" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M-2 12 L6 4" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M-2 4 L6 4" stroke="#0077C8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  </g>
-</svg>`,
-}
-
-const LOGO_EAND: ThemeLogo = {
-  width: 60,
-  height: 30,
-  svg: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="30" viewBox="0 0 60 30">
-  <text x="0" y="23" font-family="Arial,sans-serif" font-size="24" font-weight="bold" fill="#c41e3a">e&amp;</text>
-</svg>`,
-}
-
-const LOGO_GOAI247: ThemeLogo = {
-  width: 120,
-  height: 30,
-  svg: `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="30" viewBox="0 0 120 30">
-  <text x="0" y="22" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="currentColor">GoAI</text>
-  <text x="52" y="22" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#2563eb">247</text>
-</svg>`,
-}
-
-const LOGO_GOAI_NAVY: ThemeLogo = {
-  width: 110,
-  height: 35,
-  svg: `<svg xmlns="http://www.w3.org/2000/svg" width="110" height="35" viewBox="0 0 110 35">
-  <text x="0" y="26" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="currentColor">GoAI</text>
-  <g transform="translate(55,2)">
-    <path d="M0 8 L8 0" stroke="#004080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M0 0 L8 0" stroke="#004080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M-2 12 L6 4" stroke="#004080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M-2 4 L6 4" stroke="#004080" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  </g>
-</svg>`,
-}
-
 // ── Registry ─────────────────────────────────────────────────────────
 
 export const themeRegistry: ThemeEntry[] = [
@@ -113,7 +64,7 @@ export const themeRegistry: ThemeEntry[] = [
     description: 'Purple & orange palette from the Instapay Sentiment project',
     source: 'insta_sentiment/tokens.css',
     brandName: 'Instapay',
-    logo: LOGO_INSTAPAY,
+    logo: { url: '/logos/instapaylogo.png', fileName: 'instapaylogo.png', width: 120, height: 40 },
     tokens: {
       '--composer-primary': '#512772',
       '--composer-primary-hover': '#43205f',
@@ -144,7 +95,7 @@ export const themeRegistry: ThemeEntry[] = [
     description: 'Corporate blue palette from the GoAI One project',
     source: 'GoAi-one/index.css',
     brandName: 'GoAI One',
-    logo: LOGO_GOAI,
+    logo: { url: '/logos/goai-logo-sidebar.svg', fileName: 'goai-logo-sidebar.svg', width: 90, height: 28 },
     tokens: {
       '--composer-primary': '#0077C8',
       '--composer-primary-hover': '#005fa0',
@@ -175,7 +126,7 @@ export const themeRegistry: ThemeEntry[] = [
     description: 'Red & grey brand from the Presentation AI project (E& Telecom)',
     source: 'presentation-ai/theme.css',
     brandName: 'e&',
-    logo: LOGO_EAND,
+    logo: { url: '/logos/e-and-logo.png', fileName: 'e-and-logo.png', width: 80, height: 40 },
     tokens: {
       '--composer-primary': '#c41e3a',
       '--composer-primary-hover': '#a31830',
@@ -206,7 +157,7 @@ export const themeRegistry: ThemeEntry[] = [
     description: 'Blue brand variant from the Presentation AI project (GoAI247)',
     source: 'presentation-ai/theme.css',
     brandName: 'GoAI247',
-    logo: LOGO_GOAI247,
+    logo: { url: '/logos/goai247-logo.png', fileName: 'goai247-logo.png', width: 100, height: 40 },
     tokens: {
       '--composer-primary': '#2563eb',
       '--composer-primary-hover': '#1d4ed8',
@@ -237,7 +188,7 @@ export const themeRegistry: ThemeEntry[] = [
     description: 'Deep navy palette from the GoAI One Tailwind config',
     source: 'GoAi-one/tailwind.config.ts',
     brandName: 'GoAI',
-    logo: LOGO_GOAI_NAVY,
+    logo: { url: '/logos/goai-logo-sidebar.svg', fileName: 'goai-logo-sidebar.svg', width: 90, height: 28 },
     tokens: {
       '--composer-primary': '#004080',
       '--composer-primary-hover': '#003060',
