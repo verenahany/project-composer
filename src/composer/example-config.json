@@ -1,0 +1,38 @@
+{
+  "projectName": "acme-dashboard",
+  "themeId": "goai-blue",
+  "sidebar": {
+    "componentId": "sidebar-goai",
+    "props": {
+      "collapsible": true,
+      "showLogo": true,
+      "showVersion": true,
+      "brandName": "Acme Corp"
+    }
+  },
+  "chatbot": {
+    "componentId": "chatbot-haive",
+    "props": {
+      "showHeader": true,
+      "showAvatar": true,
+      "showInput": true,
+      "showTimestamps": true
+    }
+  },
+  "icons": {
+    "dashboard": true,
+    "users": true,
+    "settings": true,
+    "messages": true,
+    "analytics": true,
+    "billing": false,
+    "notifications": true,
+    "search": false,
+    "folders": true,
+    "book": false,
+    "tickets": false,
+    "apps": false
+  },
+  "createdAt": "2026-03-26T12:00:00.000Z",
+  "updatedAt": "2026-03-26T12:00:00.000Z"
+}

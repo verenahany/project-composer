@@ -1,0 +1,58 @@
+/*
+ * Design tokens for the Project Composer app.
+ * These are the composer's own UI tokens — separate from the preview themes.
+ * Based on the Instapay Sentiment token structure.
+ */
+
+:root {
+  --color-brand-primary: #512772;
+  --color-brand-primary-hover: #43205f;
+  --color-brand-secondary: #7d569e;
+  --color-brand-secondary-hover: #684589;
+  --color-accent-soft: #f6a394;
+  --color-accent-strong: #d96628;
+
+  --color-text-default: #1c1c22;
+  --color-text-muted: #68707f;
+  --color-text-subtle: #8c92a0;
+  --color-text-inverse: #ffffff;
+
+  --color-surface-canvas: #f3f2f7;
+  --color-surface-default: #ffffff;
+  --color-surface-muted: #f7f5fa;
+  --color-surface-elevated: #fcfbfe;
+  --color-border-default: #e4deeb;
+  --color-border-strong: #d6cedf;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-sm: 0 1px 2px rgba(24, 24, 33, 0.05), 0 10px 24px rgba(24, 24, 33, 0.04);
+  --shadow-md: 0 12px 28px rgba(30, 22, 41, 0.12);
+  --shadow-lg: 0 18px 44px rgba(24, 18, 34, 0.16);
+
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: ui-monospace, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --line-height-base: 1.5;
+
+  --transition-fast: 120ms ease;
+  --transition-base: 180ms ease;
+  --transition-slow: 300ms ease;
+}
