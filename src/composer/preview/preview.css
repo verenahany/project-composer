@@ -94,6 +94,15 @@
   text-overflow: ellipsis;
 }
 
+.prev-logo {
+  flex-shrink: 0;
+}
+
+.prev-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
 .prev-sidebar__toggle {
   display: flex;
   align-items: center;

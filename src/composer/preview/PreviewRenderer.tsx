@@ -36,6 +36,7 @@ export default function PreviewRenderer({ config }: Props) {
   }))
 
   const isHorizontalNav = sidebarEntry?.variant === 'horizontal'
+  const logo = theme?.logo
 
   return (
     <div className="prev-app" style={themeStyles}>
@@ -45,6 +46,7 @@ export default function PreviewRenderer({ config }: Props) {
           sidebarConfig={config.sidebar}
           icons={config.icons}
           iconMeta={iconMeta}
+          logo={logo}
         />
       )}
       <div className="prev-app__body" data-layout={isHorizontalNav ? 'horizontal' : 'vertical'}>
@@ -54,6 +56,7 @@ export default function PreviewRenderer({ config }: Props) {
             sidebarConfig={config.sidebar}
             icons={config.icons}
             iconMeta={iconMeta}
+            logo={logo}
           />
         )}
         <main className="prev-app__main">

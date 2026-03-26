@@ -31,13 +31,14 @@ function buildVerticalSidebar(
   imports: string,
   _iconMapEntries: string,
 ): string {
-  const { collapsible, showLogo, showVersion, brandName } = config.sidebar.props
+  const { collapsible, showLogo, showVersion } = config.sidebar.props
   const navItems = activeIcons.map((ic) =>
     `    { id: '${ic.id}', label: '${ic.label}', icon: ${ic.lucideName} },`
   ).join('\n')
 
   return `${imports}
 import { useState } from 'react'
+import Logo from './Logo'
 
 const NAV_ITEMS = [
 ${navItems}
@@ -50,7 +51,7 @@ export default function Sidebar() {
   return (
     <aside className={\`sidebar \${isCollapsed ? 'sidebar--collapsed' : ''}\`}>
       <div className="sidebar__header">
-        ${showLogo ? `{!isCollapsed && <span className="sidebar__brand">${brandName}</span>}` : ''}
+        ${showLogo ? '{!isCollapsed && <Logo />}' : ''}
         ${collapsible ? `<button
           className="sidebar__toggle"
           onClick={() => setCollapsed((c) => !c)}
@@ -93,12 +94,13 @@ function buildHorizontalSidebar(
   imports: string,
   _iconMapEntries: string,
 ): string {
-  const { showLogo, brandName } = config.sidebar.props
+  const { showLogo } = config.sidebar.props
   const navItems = activeIcons.map((ic) =>
     `    { id: '${ic.id}', label: '${ic.label}', icon: ${ic.lucideName} },`
   ).join('\n')
 
   return `${imports}
+import Logo from './Logo'
 
 const NAV_ITEMS = [
 ${navItems}
@@ -107,7 +109,7 @@ ${navItems}
 export default function Sidebar() {
   return (
     <header className="header-bar">
-      ${showLogo ? `<span className="header-bar__brand">${brandName}</span>` : ''}
+      ${showLogo ? '<Logo />' : ''}
       <nav className="header-bar__nav">
         {NAV_ITEMS.map((item, idx) => {
           const Icon = item.icon

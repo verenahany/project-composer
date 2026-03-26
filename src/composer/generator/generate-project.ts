@@ -44,6 +44,7 @@ export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
     { path: 'src/theme.css', content: buildThemeCss(theme) },
 
     // Components
+    { path: 'src/components/Logo.tsx', content: buildLogoComponent(theme) },
     { path: 'src/components/Sidebar.tsx', content: buildSidebarComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
     { path: 'src/components/Chatbot.tsx', content: buildChatbotComponent(config) },
   ]
@@ -177,6 +178,27 @@ ${icons}
 - Sidebar items: edit \`src/components/Sidebar.tsx\`
 - Chat UI: edit \`src/components/Chatbot.tsx\`
 - Layout: edit \`src/App.tsx\`
+`
+}
+
+function buildLogoComponent(theme: ThemeEntry | undefined): string {
+  if (!theme) {
+    return `export default function Logo() {
+  return <span style={{ fontWeight: 700, fontSize: 16 }}>Logo</span>
+}
+`
+  }
+  const escapedSvg = theme.logo.svg.replace(/`/g, '\\`').replace(/\$/g, '\\$')
+  const w = Math.round(theme.logo.width * 0.75)
+  const h = Math.round(theme.logo.height * 0.75)
+  return `export default function Logo() {
+  return (
+    <span
+      dangerouslySetInnerHTML={{ __html: \`${escapedSvg}\` }}
+      style={{ display: 'inline-flex', width: ${w}, height: ${h} }}
+    />
+  )
+}
 `
 }
 

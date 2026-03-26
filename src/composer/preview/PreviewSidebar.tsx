@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import type { SidebarConfig, IconConfig } from '../config/schema'
 import type { SidebarEntry } from '../registries/sidebar-registry'
+import type { ThemeLogo } from '../registries/theme-registry'
 
 const ICON_MAP: Record<string, ComponentType<{ size?: number }>> = {
   LayoutDashboard, Users, Settings, MessageCircle, BarChart3,
@@ -23,9 +24,21 @@ interface Props {
   sidebarConfig: SidebarConfig
   icons: IconConfig
   iconMeta: { id: string; label: string; lucideName: string }[]
+  logo?: ThemeLogo
 }
 
-export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta }: Props) {
+function LogoRenderer({ logo }: { logo?: ThemeLogo }) {
+  if (!logo) return null
+  return (
+    <span
+      className="prev-logo"
+      dangerouslySetInnerHTML={{ __html: logo.svg }}
+      style={{ display: 'inline-flex', width: logo.width * 0.7, height: logo.height * 0.7 }}
+    />
+  )
+}
+
+export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta, logo }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const { props } = sidebarConfig
   const activeIcons = iconMeta.filter((ic) => icons[ic.id])
@@ -34,7 +47,7 @@ export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta }
     return (
       <header className="prev-header-bar">
         {props.showLogo && (
-          <span className="prev-header-bar__brand">{props.brandName}</span>
+          logo ? <LogoRenderer logo={logo} /> : <span className="prev-header-bar__brand">{props.brandName}</span>
         )}
         <nav className="prev-header-bar__nav">
           {activeIcons.map((ic) => {
@@ -61,7 +74,7 @@ export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta }
       {/* Header */}
       <div className="prev-sidebar__header">
         {!isCollapsed && props.showLogo && (
-          <span className="prev-sidebar__brand">{props.brandName}</span>
+          logo ? <LogoRenderer logo={logo} /> : <span className="prev-sidebar__brand">{props.brandName}</span>
         )}
         {props.collapsible && (
           <button
