@@ -1,23 +1,23 @@
 /**
- * Project generator — builds project file contents from a composed config.
- *
- * Used by:
- *   - Local export (download files)
- *   - GitHub push (upload files to a new repo)
+ * Project generator — builds a complete Vite + React project from the composed config.
+ * The output is a full runnable template with the selected sidebar, chatbot, theme, and icons.
  */
 
 import type { ProjectConfig } from '../config/schema'
 import { getThemeById, type ThemeEntry } from '../registries/theme-registry'
-import { getSidebarById, type SidebarEntry } from '../registries/sidebar-registry'
-import { getChatbotById, type ChatbotEntry } from '../registries/chatbot-registry'
+import { getSidebarById } from '../registries/sidebar-registry'
+import { getChatbotById } from '../registries/chatbot-registry'
 import { iconRegistry } from '../registries/icon-registry'
+import { buildSidebarComponent } from './templates/sidebar-template'
+import { buildChatbotComponent } from './templates/chatbot-template'
+import { buildAppComponent } from './templates/app-template'
+import { buildThemeCss } from './templates/theme-template'
+import { buildComponentsCss } from './templates/components-css-template'
 
 export interface GeneratedFile {
   path: string
   content: string
 }
-
-// ── Build all project files ──────────────────────────────────────────
 
 export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
   const theme = getThemeById(config.themeId)
@@ -25,205 +25,164 @@ export function buildProjectFiles(config: ProjectConfig): GeneratedFile[] {
   const chatbot = getChatbotById(config.chatbot.componentId)
   const activeIcons = iconRegistry.filter((ic) => config.icons[ic.id])
 
-  return [
-    { path: 'index.html', content: buildHtml(config, theme, sidebar, activeIcons) },
-    { path: 'styles.css', content: buildCss(config, theme, sidebar, chatbot) },
-    { path: 'README.md', content: buildReadme(config, theme, sidebar, chatbot) },
+  const files: GeneratedFile[] = [
+    // Root config files
+    { path: 'package.json', content: buildPackageJson(config) },
+    { path: 'tsconfig.json', content: TSCONFIG },
+    { path: 'vite.config.ts', content: VITE_CONFIG },
+    { path: 'index.html', content: buildIndexHtml(config) },
+    { path: '.gitignore', content: 'node_modules/\ndist/\n.vite/\n' },
     { path: 'project-config.json', content: JSON.stringify(config, null, 2) },
-  ]
-}
+    { path: 'README.md', content: buildReadme(config, theme, sidebar?.displayName, chatbot?.displayName) },
 
-// ── JSON export (local download) ─────────────────────────────────────
+    // Source files
+    { path: 'src/main.tsx', content: MAIN_TSX },
+    { path: 'src/App.tsx', content: buildAppComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
+    { path: 'src/App.css', content: buildComponentsCss() },
+
+    // Theme
+    { path: 'src/theme.css', content: buildThemeCss(theme) },
+
+    // Components
+    { path: 'src/components/Sidebar.tsx', content: buildSidebarComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
+    { path: 'src/components/Chatbot.tsx', content: buildChatbotComponent(config) },
+  ]
+
+  return files
+}
 
 export function exportConfigAsJson(config: ProjectConfig): void {
   const json = JSON.stringify(config, null, 2)
-  download(`${config.projectName}-config.json`, json, 'application/json')
+  downloadFile(config.projectName + '-config.json', json, 'application/json')
 }
 
-// ── Local file download ──────────────────────────────────────────────
+// ── Static file contents ─────────────────────────────────────────────
 
-export function downloadProjectFiles(config: ProjectConfig): void {
-  const files = buildProjectFiles(config)
-  files.forEach((file, i) => {
-    setTimeout(() => download(file.path, file.content, 'text/plain'), i * 100)
-  })
+function buildPackageJson(config: ProjectConfig): string {
+  return JSON.stringify({
+    name: config.projectName,
+    version: '1.0.0',
+    private: true,
+    type: 'module',
+    scripts: {
+      dev: 'vite',
+      build: 'tsc && vite build',
+      preview: 'vite preview',
+    },
+    dependencies: {
+      'lucide-react': '^0.577.0',
+      react: '^19.2.4',
+      'react-dom': '^19.2.4',
+    },
+    devDependencies: {
+      '@types/react': '^19.2.14',
+      '@types/react-dom': '^19.2.3',
+      '@vitejs/plugin-react': '^5.1.4',
+      typescript: '~5.9.3',
+      vite: '^7.3.1',
+    },
+  }, null, 2)
 }
 
-// ── File builders ────────────────────────────────────────────────────
+const TSCONFIG = JSON.stringify({
+  compilerOptions: {
+    target: 'ES2022',
+    jsx: 'react-jsx',
+    module: 'ESNext',
+    lib: ['ES2022', 'DOM', 'DOM.Iterable'],
+    types: ['vite/client'],
+    skipLibCheck: true,
+    moduleResolution: 'bundler',
+    allowImportingTsExtensions: true,
+    verbatimModuleSyntax: true,
+    moduleDetection: 'force',
+    noEmit: true,
+    strict: true,
+  },
+  include: ['src'],
+}, null, 2)
 
-function buildHtml(
-  config: ProjectConfig,
-  _theme: ThemeEntry | undefined,
-  sidebar: SidebarEntry | undefined,
-  activeIcons: { id: string; label: string }[],
-): string {
-  const sidebarNav = activeIcons
-    .map((ic) => `        <a class="nav-item" href="#${ic.id}" title="${ic.label}">${ic.label}</a>`)
-    .join('\n')
+const VITE_CONFIG = `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+export default defineConfig({
+  plugins: [react()],
+  server: { port: 3000 },
+})
+`
+
+function buildIndexHtml(config: ProjectConfig): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${config.projectName}</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="app" data-sidebar="${sidebar?.variant ?? 'vertical'}">
-    ${sidebar?.variant === 'horizontal' ? `
-    <header class="header-bar">
-      ${config.sidebar.props.showLogo ? `<span class="brand">${config.sidebar.props.brandName}</span>` : ''}
-      <nav class="header-nav">
-${sidebarNav}
-      </nav>
-    </header>` : ''}
-    <div class="app-body">
-      ${sidebar?.variant !== 'horizontal' ? `
-      <aside class="sidebar" data-collapsible="${config.sidebar.props.collapsible}">
-        ${config.sidebar.props.showLogo ? `<div class="sidebar-header"><span class="brand">${config.sidebar.props.brandName}</span></div>` : ''}
-        <nav class="sidebar-nav">
-${sidebarNav}
-        </nav>
-        ${config.sidebar.props.showVersion ? '<div class="sidebar-footer">Version 1.0</div>' : ''}
-      </aside>` : ''}
-      <main class="main-content">
-        <h1>${config.projectName}</h1>
-        <p>Generated by Project Composer</p>
-
-        <div class="chat-container">
-          ${config.chatbot.props.showHeader ? `
-          <div class="chat-header">
-            <span>Chat</span>
-          </div>` : ''}
-          <div class="chat-messages">
-            <div class="message message--assistant">
-              <p>Hello! How can I help you?</p>
-            </div>
-            <div class="message message--user">
-              <p>I have a question.</p>
-            </div>
-          </div>
-          ${config.chatbot.props.showInput ? `
-          <div class="chat-input-area">
-            <input type="text" placeholder="Type a message..." />
-            <button>Send</button>
-          </div>` : ''}
-        </div>
-      </main>
-    </div>
-  </div>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>`
 }
 
-function buildCss(
-  config: ProjectConfig,
-  theme: ThemeEntry | undefined,
-  sidebar: SidebarEntry | undefined,
-  chatbot: ChatbotEntry | undefined,
-): string {
-  const themeVars = theme
-    ? (Object.entries(theme.tokens) as [string, string][])
-        .map(([k, v]) => `  ${k}: ${v};`)
-        .join('\n')
-    : ''
+const MAIN_TSX = `import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App'
+import './theme.css'
+import './App.css'
 
-  return `/* Generated styles for ${config.projectName} */
-/* Theme: ${theme?.displayName ?? config.themeId} */
-/* Sidebar: ${sidebar?.displayName ?? config.sidebar.componentId} */
-/* Chatbot: ${chatbot?.displayName ?? config.chatbot.componentId} */
-
-:root {
-${themeVars}
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--composer-background);
-  color: var(--composer-foreground);
-}
-
-.app { display: flex; flex-direction: column; min-height: 100vh; }
-.app-body { display: flex; flex: 1; }
-.app[data-sidebar="horizontal"] .app-body { flex-direction: column; }
-
-.sidebar {
-  width: 240px;
-  background: var(--composer-sidebar-bg);
-  color: var(--composer-sidebar-fg);
-  border-right: 1px solid var(--composer-sidebar-border);
-  display: flex; flex-direction: column; flex-shrink: 0;
-}
-.sidebar-header { padding: 16px; border-bottom: 1px solid var(--composer-sidebar-border); }
-.sidebar-header .brand { font-weight: 700; font-size: 16px; }
-.sidebar-nav { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 2px; }
-.nav-item {
-  display: block; padding: 10px 14px; border-radius: 6px;
-  text-decoration: none; color: inherit; font-size: 14px;
-  font-weight: 500; transition: background 150ms;
-}
-.nav-item:hover { background: var(--composer-sidebar-hover); }
-.nav-item:first-child { background: var(--composer-sidebar-active); color: var(--composer-sidebar-active-fg); }
-.sidebar-footer { padding: 12px; border-top: 1px solid var(--composer-sidebar-border); font-size: 12px; text-align: center; opacity: 0.65; }
-
-.header-bar { display: flex; align-items: center; gap: 24px; height: 56px; padding: 0 24px; background: var(--composer-card); border-bottom: 1px solid var(--composer-border); }
-.header-bar .brand { font-weight: 700; font-size: 16px; color: var(--composer-primary); }
-.header-nav { display: flex; gap: 4px; }
-.header-nav .nav-item { padding: 8px 16px; border-radius: 6px; }
-
-.main-content { flex: 1; padding: 32px; }
-.main-content h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-.main-content p { color: var(--composer-muted-foreground); margin-bottom: 24px; }
-
-.chat-container { max-width: 600px; border: 1px solid var(--composer-border); border-radius: 12px; overflow: hidden; background: var(--composer-card); }
-.chat-header { padding: 12px 16px; border-bottom: 1px solid var(--composer-border); font-weight: 600; }
-.chat-messages { padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 200px; }
-.message { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
-.message--assistant { align-self: flex-start; background: var(--composer-muted); }
-.message--user { align-self: flex-end; background: var(--composer-primary); color: var(--composer-primary-foreground); }
-.chat-input-area { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--composer-border); }
-.chat-input-area input { flex: 1; padding: 8px 12px; border: 1px solid var(--composer-border); border-radius: 8px; font-size: 14px; background: var(--composer-muted); color: var(--composer-foreground); outline: none; }
-.chat-input-area button { padding: 8px 16px; border: none; border-radius: 8px; background: var(--composer-primary); color: var(--composer-primary-foreground); font-weight: 600; cursor: pointer; }
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
 `
-}
 
 function buildReadme(
   config: ProjectConfig,
   theme: ThemeEntry | undefined,
-  sidebar: SidebarEntry | undefined,
-  chatbot: ChatbotEntry | undefined,
+  sidebarName: string | undefined,
+  chatbotName: string | undefined,
 ): string {
+  const icons = Object.entries(config.icons).filter(([, v]) => v).map(([k]) => '- ' + k).join('\n')
   return `# ${config.projectName}
 
-Generated by **Project Composer** on ${new Date().toLocaleDateString()}.
+Generated by **Project Composer**.
+
+## Quick Start
+
+\`\`\`bash
+npm install
+npm run dev
+\`\`\`
+
+Open http://localhost:3000
 
 ## Theme
 **${theme?.displayName ?? config.themeId}** — ${theme?.description ?? ''}
 
 ## Components
-- **Sidebar:** ${sidebar?.displayName ?? config.sidebar.componentId} (${sidebar?.variant ?? 'vertical'})
-- **Chat UI:** ${chatbot?.displayName ?? config.chatbot.componentId}
+- **Sidebar:** ${sidebarName ?? config.sidebar.componentId}
+- **Chat UI:** ${chatbotName ?? config.chatbot.componentId}
 
 ## Active Nav Icons
-${Object.entries(config.icons)
-  .filter(([, v]) => v)
-  .map(([k]) => '- ' + k)
-  .join('\n')}
+${icons}
 
-## Getting Started
-1. Open index.html in a browser
-2. Customize styles in styles.css
-3. See project-config.json for the full composer config
+## Customizing
+- Theme colors: edit CSS variables in \`src/theme.css\`
+- Sidebar items: edit \`src/components/Sidebar.tsx\`
+- Chat UI: edit \`src/components/Chatbot.tsx\`
+- Layout: edit \`src/App.tsx\`
 `
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-function download(filename: string, content: string, mimeType: string): void {
+function downloadFile(filename: string, content: string, mimeType: string): void {
   const blob = new Blob([content], { type: mimeType })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

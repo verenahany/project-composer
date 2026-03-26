@@ -113,16 +113,18 @@ export async function pushToGitHub(
     const blobShas: { path: string; sha: string }[] = []
 
     for (const file of files) {
+      log(`  ↳ ${file.path}`)
       const blobRes = await ghFetch(`/repos/${owner}/${repoName}/git/blobs`, token, {
         method: 'POST',
         body: JSON.stringify({
-          content: file.content,
-          encoding: 'utf-8',
+          content: btoa(unescape(encodeURIComponent(file.content))),
+          encoding: 'base64',
         }),
       })
 
       if (!blobRes.ok) {
-        return { success: false, error: `Failed to upload ${file.path}` }
+        const errBody = await blobRes.json().catch(() => ({}))
+        return { success: false, error: `Failed to upload ${file.path}: ${errBody.message ?? blobRes.statusText}` }
       }
 
       const blob = await blobRes.json()
@@ -144,23 +146,26 @@ export async function pushToGitHub(
     })
 
     if (!treeRes.ok) {
-      return { success: false, error: 'Failed to create file tree.' }
+      const errBody = await treeRes.json().catch(() => ({}))
+      return { success: false, error: `Failed to create file tree: ${errBody.message ?? treeRes.statusText}` }
     }
 
     const tree = await treeRes.json()
 
-    // 6. Create a commit
+    // 6. Create a commit (parents: [] for first commit on empty repo)
     log('Creating commit...')
     const commitRes = await ghFetch(`/repos/${owner}/${repoName}/git/commits`, token, {
       method: 'POST',
       body: JSON.stringify({
         message: 'Initial commit from Project Composer',
         tree: tree.sha,
+        parents: [],
       }),
     })
 
     if (!commitRes.ok) {
-      return { success: false, error: 'Failed to create commit.' }
+      const errBody = await commitRes.json().catch(() => ({}))
+      return { success: false, error: `Failed to create commit: ${errBody.message ?? commitRes.statusText}` }
     }
 
     const commit = await commitRes.json()
@@ -176,7 +181,8 @@ export async function pushToGitHub(
     })
 
     if (!refRes.ok) {
-      return { success: false, error: 'Failed to create branch.' }
+      const errBody = await refRes.json().catch(() => ({}))
+      return { success: false, error: `Failed to create branch: ${errBody.message ?? refRes.statusText}` }
     }
 
     // 8. Update default branch to main
