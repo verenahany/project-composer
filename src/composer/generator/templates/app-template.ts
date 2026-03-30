@@ -13,16 +13,14 @@ export function buildAppComponent(
 
   const imports = [`import Sidebar from './components/Sidebar'`, `import Chatbot from './components/Chatbot'`]
   if (showTopBarInMain) {
-    imports.unshift(`import { useState } from 'react'`)
     imports.push(`import TopBar from './components/TopBar'`)
   }
 
-  const stateHook = showTopBarInMain ? `\n  const [sidebarOpen, setSidebarOpen] = useState(true)\n` : ''
-  const topBarJsx = showTopBarInMain ? `\n          <TopBar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />` : ''
+  const topBarJsx = showTopBarInMain ? `\n          <TopBar />` : ''
 
   return `${imports.join('\n')}
 
-export default function App() {${stateHook}
+export default function App() {
   return (
     <div className="app${isHorizontal ? ' app--horizontal' : ''}">
       <Sidebar />

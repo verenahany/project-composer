@@ -16,26 +16,11 @@ export function buildComponentsCss(): string {
   overflow-y: auto;
 }
 
-.main__header {
-  padding: 32px 32px 0;
-}
-
-.main__header h1 {
-  margin: 0 0 4px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.main__header p {
-  margin: 0 0 24px;
-  font-size: 14px;
-  color: var(--composer-muted-foreground);
-}
-
 .main__content {
   flex: 1;
-  padding: 0 32px 32px;
-  max-width: 700px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Vertical Sidebar ─────────────────────────────────── */
@@ -204,12 +189,11 @@ export function buildComponentsCss(): string {
 .chat {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 400px;
-  border-radius: 12px;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   background: var(--composer-card);
-  border: 1px solid var(--composer-border);
+  border-left: 1px solid var(--composer-border);
 }
 
 .chat__header {
@@ -448,7 +432,7 @@ export function buildComponentsCss(): string {
 .topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: 56px;
   min-height: 56px;
   padding: 0 20px;
@@ -459,21 +443,8 @@ export function buildComponentsCss(): string {
   z-index: 40;
 }
 
-.topbar__toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--composer-foreground);
-  cursor: pointer;
-}
-
-.topbar__toggle:hover {
-  background: var(--composer-muted);
+.topbar__spacer {
+  flex: 1;
 }
 
 .topbar__actions {
@@ -835,11 +806,10 @@ export function buildComponentsCss(): string {
 .pres-chat {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 400px;
+  flex: 1;
+  min-height: 0;
   background: var(--composer-card);
-  border-radius: 12px;
-  border: 1px solid var(--composer-border);
+  border-left: 1px solid var(--composer-border);
   overflow: hidden;
 }
 

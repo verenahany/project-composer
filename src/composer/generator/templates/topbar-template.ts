@@ -4,11 +4,9 @@ export function buildTopBarComponent(config: ProjectConfig): string {
   const { showProfile, showNotifications } = config.sidebar.props
 
   return `import { useState } from 'react'
-import { Bell, User, LogOut, ChevronDown, Menu } from 'lucide-react'
+import { Bell, User, LogOut, ChevronDown } from 'lucide-react'
 
 interface TopBarProps {
-  sidebarOpen?: boolean
-  onToggleSidebar?: () => void
   embedded?: boolean
 }
 
@@ -16,7 +14,7 @@ ${showNotifications ? buildNotificationBell() : ''}
 
 ${showProfile ? buildProfileDropdown() : ''}
 
-export default function TopBar({ sidebarOpen, onToggleSidebar, embedded }: TopBarProps) {
+export default function TopBar({ embedded }: TopBarProps) {
   if (embedded) {
     return (
       <>
@@ -27,10 +25,8 @@ export default function TopBar({ sidebarOpen, onToggleSidebar, embedded }: TopBa
   }
 
   return (
-    <div className={\`topbar \${sidebarOpen ? 'topbar--sidebar-open' : 'topbar--sidebar-closed'}\`}>
-      <button className="topbar__toggle" onClick={onToggleSidebar} title="Toggle sidebar">
-        <Menu size={18} />
-      </button>
+    <div className="topbar">
+      <div className="topbar__spacer" />
       <div className="topbar__actions">
         ${showNotifications ? '<NotificationBell />' : ''}
         ${showProfile ? '<ProfileDropdown />' : ''}
