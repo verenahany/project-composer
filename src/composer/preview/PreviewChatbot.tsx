@@ -3,9 +3,9 @@
  * All variants share the enhanced input bar and feedback actions from Presentation AI.
  */
 
-import type { FC } from 'react'
+import { useState, useRef, useEffect, useCallback, type FC } from 'react'
 import {
-  MessageCircle, Send, Bot, User, MicOff,
+  MessageCircle, Send, Bot, User, Mic, MicOff,
   Copy, ThumbsUp, ThumbsDown, RefreshCcw,
   Globe, Settings2, MessageSquarePlus,
 } from 'lucide-react'
@@ -47,28 +47,103 @@ function FeedbackActions({ role, props }: { role: 'user' | 'assistant'; props: C
 
 /* ── Shared enhanced input bar (used by all variants) ───────────── */
 
+interface SpeechRecInstance {
+  lang: string; interimResults: boolean; continuous: boolean; maxAlternatives: number
+  start(): void; stop(): void
+  onstart: (() => void) | null; onend: (() => void) | null
+  onresult: ((e: { results: SpeechRecognitionResultList }) => void) | null
+  onerror: ((e: { error?: string }) => void) | null
+}
+
 function EnhancedInputBar({ props, placeholder }: { props: ChatProps; placeholder: string }) {
   const hasToolbar = props.showMic || props.showWebSearch || props.showNewChat || props.showConfigButton
+  const [input, setInput] = useState('')
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false)
+  const [configOpen, setConfigOpen] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const recognitionRef = useRef<SpeechRecInstance | null>(null)
+  const stoppedRef = useRef(false)
+  const inputRef = useRef(input)
+  useEffect(() => { inputRef.current = input }, [input])
+
+  const handleMicClick = useCallback(() => {
+    const W = window as unknown as { webkitSpeechRecognition?: new () => SpeechRecInstance; SpeechRecognition?: new () => SpeechRecInstance }
+    const Rec = W.webkitSpeechRecognition ?? W.SpeechRecognition
+    if (!Rec) { alert('Speech recognition not supported in this browser'); return }
+
+    if (recognitionRef.current && isListening) {
+      stoppedRef.current = true
+      try { recognitionRef.current.stop() } catch { /* ignore */ }
+      return
+    }
+
+    const rec = new Rec()
+    recognitionRef.current = rec
+    stoppedRef.current = false
+    rec.lang = 'en-US'
+    rec.interimResults = false
+    rec.maxAlternatives = 1
+    rec.continuous = true
+    rec.onstart = () => setIsListening(true)
+    rec.onresult = (e) => {
+      if (stoppedRef.current) return
+      const r = e.results
+      if (!r || !r.length) return
+      const t = r[r.length - 1]?.[0]?.transcript ?? ''
+      if (t) setInput((prev) => (prev ? prev + ' ' : '') + t.trim())
+    }
+    rec.onerror = (e) => {
+      if (e.error === 'aborted' || e.error === 'no-speech') return
+      setIsListening(false)
+      recognitionRef.current = null
+    }
+    rec.onend = () => {
+      if (stoppedRef.current) { setIsListening(false); recognitionRef.current = null; return }
+      try { rec.start() } catch { /* ignore */ }
+    }
+    rec.start()
+  }, [isListening])
+
+  useEffect(() => () => { try { recognitionRef.current?.stop() } catch { /* ignore */ } }, [])
+
   if (!props.showInput) return null
 
   if (!hasToolbar) {
     return (
       <div className="prev-chat__input-area">
-        <input className="prev-chat__input" placeholder={placeholder} readOnly />
-        <button className="prev-chat__send"><Send size={14} /></button>
+        <input className="prev-chat__input" placeholder={placeholder} value={input} onChange={(e) => setInput(e.target.value)} />
+        <button className="prev-chat__send" onClick={() => setInput('')}><Send size={14} /></button>
       </div>
     )
   }
 
   return (
     <div className="pres-chat__input-wrap">
-      <textarea className="pres-chat__textarea" placeholder={placeholder} rows={1} readOnly />
+      <textarea
+        className="pres-chat__textarea"
+        placeholder={placeholder}
+        rows={1}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') } }}
+      />
       <div className="pres-chat__toolbar">
         {props.showConfigButton && (
-          <button className="pres-chat__tool-btn" title="Chat config"><Settings2 size={13} /></button>
+          <button
+            className={`pres-chat__tool-btn ${configOpen ? 'pres-chat__tool-btn--active' : ''}`}
+            title="Chat config"
+            onClick={() => setConfigOpen(!configOpen)}
+          >
+            <Settings2 size={13} />
+          </button>
         )}
         {props.showWebSearch && (
-          <button className="pres-chat__tool-btn pres-chat__tool-btn--web" title="Web search">
+          <button
+            className={`pres-chat__tool-btn pres-chat__tool-btn--web ${webSearchEnabled ? 'pres-chat__tool-btn--active' : ''}`}
+            title={webSearchEnabled ? 'Web search on (click to turn off)' : 'Web search off — click to enable'}
+            onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+            aria-pressed={webSearchEnabled}
+          >
             <Globe size={13} /><span>Web</span>
           </button>
         )}
@@ -79,9 +154,15 @@ function EnhancedInputBar({ props, placeholder }: { props: ChatProps; placeholde
             </button>
           )}
           {props.showMic && (
-            <button className="pres-chat__circle-btn" title="Voice input"><MicOff size={13} /></button>
+            <button
+              className={`pres-chat__circle-btn ${isListening ? 'pres-chat__circle-btn--active' : ''}`}
+              title={isListening ? 'Stop recording' : 'Voice input'}
+              onClick={handleMicClick}
+            >
+              {isListening ? <Mic size={13} /> : <MicOff size={13} />}
+            </button>
           )}
-          <button className="pres-chat__circle-btn" title="Send"><Send size={13} /></button>
+          <button className="pres-chat__circle-btn" title="Send" onClick={() => setInput('')}><Send size={13} /></button>
         </div>
       </div>
     </div>

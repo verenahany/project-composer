@@ -27,7 +27,7 @@ function collectIcons(props: ChatProps, base: string[]): string {
 }
 
 function needsState(props: ChatProps): boolean {
-  return props.showMic || props.showFeedback || props.showWebSearch || props.showNewChat || props.showConfigButton
+  return props.showMic || props.showFeedback || props.showWebSearch || props.showNewChat || props.showConfigButton || props.showInput
 }
 
 function buildFeedbackJsx(role: string): string {
@@ -64,8 +64,22 @@ function buildEnhancedInputBar(props: ChatProps, placeholder: string): string {
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') } }}
         />
         <div className="pres-chat__toolbar">
-          ${props.showConfigButton ? `<button className="pres-chat__tool-btn" title="Chat config"><Settings2 size={14} /></button>` : ''}
-          ${props.showWebSearch ? `<button className="pres-chat__tool-btn pres-chat__tool-btn--web" title="Web search"><Globe size={14} /><span>Web</span></button>` : ''}
+          ${props.showConfigButton ? `<button
+            className={\`pres-chat__tool-btn \${configOpen ? 'pres-chat__tool-btn--active' : ''}\`}
+            title="Chat config"
+            onClick={() => setConfigOpen(!configOpen)}
+          >
+            <Settings2 size={14} />
+          </button>` : ''}
+          ${props.showWebSearch ? `<button
+            className={\`pres-chat__tool-btn pres-chat__tool-btn--web \${webSearchEnabled ? 'pres-chat__tool-btn--active' : ''}\`}
+            title={webSearchEnabled ? 'Web search on (click to turn off)' : 'Web search off — click to enable'}
+            onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+            aria-pressed={webSearchEnabled}
+          >
+            <Globe size={14} />
+            <span>Web</span>
+          </button>` : ''}
           <div className="pres-chat__toolbar-right">
             ${props.showNewChat ? `<button className="pres-chat__new-chat-btn"><MessageSquarePlus size={13} /><span>New chat</span></button>` : ''}
             ${props.showMic ? `<button
@@ -85,6 +99,8 @@ function buildEnhancedInputBar(props: ChatProps, placeholder: string): string {
 
 function buildStateBlock(props: ChatProps): string {
   let s = `const [input, setInput] = useState('')\n`
+  if (props.showWebSearch) s += `  const [webSearchEnabled, setWebSearchEnabled] = useState(false)\n`
+  if (props.showConfigButton) s += `  const [configOpen, setConfigOpen] = useState(false)\n`
   if (props.showMic) s += `  ${MIC_STATE_BLOCK}\n`
   return s
 }

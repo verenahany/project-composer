@@ -164,6 +164,16 @@ export function buildComponentsCss(): string {
   align-items: center;
   gap: 4px;
   overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .header-bar__tab {
@@ -1020,6 +1030,12 @@ export function buildComponentsCss(): string {
 }
 
 .pres-chat__tool-btn--web { color: var(--composer-primary); }
+
+.pres-chat__tool-btn--active {
+  border-color: var(--composer-primary);
+  background: color-mix(in srgb, var(--composer-primary) 15%, transparent);
+  color: var(--composer-primary);
+}
 
 .pres-chat__toolbar-right {
   display: flex;

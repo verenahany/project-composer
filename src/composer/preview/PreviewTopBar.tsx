@@ -119,6 +119,17 @@ function ProfileDropdownPreview() {
   )
 }
 
+export function TopBarActions({ sidebarConfig }: Props) {
+  const { showProfile, showNotifications } = sidebarConfig.props
+  if (!showProfile && !showNotifications) return null
+  return (
+    <>
+      {showNotifications && <NotificationBellPreview />}
+      {showProfile && <ProfileDropdownPreview />}
+    </>
+  )
+}
+
 export default function PreviewTopBar({ sidebarConfig }: Props) {
   const { showProfile, showNotifications } = sidebarConfig.props
   if (!showProfile && !showNotifications) return null

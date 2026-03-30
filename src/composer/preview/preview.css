@@ -194,6 +194,16 @@
   align-items: center;
   gap: 4px;
   overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+.prev-header-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .prev-header-bar__tab {
@@ -1047,6 +1057,12 @@
 }
 
 .pres-chat__tool-btn--web {
+  color: var(--composer-primary);
+}
+
+.pres-chat__tool-btn--active {
+  border-color: var(--composer-primary);
+  background: color-mix(in srgb, var(--composer-primary) 15%, transparent);
   color: var(--composer-primary);
 }
 

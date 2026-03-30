@@ -11,7 +11,7 @@ import { getSidebarById } from '../registries/sidebar-registry'
 import { iconRegistry } from '../registries/icon-registry'
 import PreviewSidebar from './PreviewSidebar'
 import PreviewChatbot from './PreviewChatbot'
-import PreviewTopBar from './PreviewTopBar'
+import PreviewTopBar, { TopBarActions } from './PreviewTopBar'
 
 interface Props {
   config: ProjectConfig
@@ -38,6 +38,7 @@ export default function PreviewRenderer({ config }: Props) {
 
   const isHorizontalNav = sidebarEntry?.variant === 'horizontal'
   const logo = theme?.logo
+  const hasTopBarActions = config.sidebar.props.showProfile || config.sidebar.props.showNotifications
 
   return (
     <div className="prev-app" style={themeStyles}>
@@ -48,6 +49,7 @@ export default function PreviewRenderer({ config }: Props) {
           icons={config.icons}
           iconMeta={iconMeta}
           logo={logo}
+          headerActions={hasTopBarActions ? <TopBarActions sidebarConfig={config.sidebar} /> : undefined}
         />
       )}
       <div className="prev-app__body" data-layout={isHorizontalNav ? 'horizontal' : 'vertical'}>
@@ -61,7 +63,7 @@ export default function PreviewRenderer({ config }: Props) {
           />
         )}
         <main className="prev-app__main">
-          <PreviewTopBar sidebarConfig={config.sidebar} />
+          {!isHorizontalNav && <PreviewTopBar sidebarConfig={config.sidebar} />}
           <div className="prev-app__content-area">
             <div className="prev-app__chatbot-area">
               <PreviewChatbot chatbotConfig={config.chatbot} />

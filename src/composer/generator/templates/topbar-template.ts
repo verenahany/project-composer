@@ -7,15 +7,25 @@ export function buildTopBarComponent(config: ProjectConfig): string {
 import { Bell, User, LogOut, ChevronDown, Menu } from 'lucide-react'
 
 interface TopBarProps {
-  sidebarOpen: boolean
-  onToggleSidebar: () => void
+  sidebarOpen?: boolean
+  onToggleSidebar?: () => void
+  embedded?: boolean
 }
 
 ${showNotifications ? buildNotificationBell() : ''}
 
 ${showProfile ? buildProfileDropdown() : ''}
 
-export default function TopBar({ sidebarOpen, onToggleSidebar }: TopBarProps) {
+export default function TopBar({ sidebarOpen, onToggleSidebar, embedded }: TopBarProps) {
+  if (embedded) {
+    return (
+      <>
+        ${showNotifications ? '<NotificationBell />' : ''}
+        ${showProfile ? '<ProfileDropdown />' : ''}
+      </>
+    )
+  }
+
   return (
     <div className={\`topbar \${sidebarOpen ? 'topbar--sidebar-open' : 'topbar--sidebar-closed'}\`}>
       <button className="topbar__toggle" onClick={onToggleSidebar} title="Toggle sidebar">

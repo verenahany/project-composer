@@ -94,13 +94,16 @@ function buildHorizontalSidebar(
   imports: string,
   _iconMapEntries: string,
 ): string {
-  const { showLogo } = config.sidebar.props
+  const { showLogo, showProfile, showNotifications } = config.sidebar.props
+  const hasActions = showProfile || showNotifications
   const navItems = activeIcons.map((ic) =>
     `    { id: '${ic.id}', label: '${ic.label}', icon: ${ic.lucideName} },`
   ).join('\n')
 
+  const topBarImport = hasActions ? `\nimport TopBar from './TopBar'` : ''
+
   return `${imports}
-import Logo from './Logo'
+import Logo from './Logo'${topBarImport}
 
 const NAV_ITEMS = [
 ${navItems}
@@ -125,6 +128,9 @@ export default function Sidebar() {
           )
         })}
       </nav>
+      ${hasActions ? `<div className="header-bar__actions">
+        <TopBar embedded />
+      </div>` : ''}
     </header>
   )
 }

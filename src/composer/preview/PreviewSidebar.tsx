@@ -4,7 +4,7 @@
  * Uses composer CSS variables for theming (no Tailwind dependency).
  */
 
-import { useState, type ComponentType } from 'react'
+import { useState, type ComponentType, type ReactNode } from 'react'
 import {
   LayoutDashboard, Users, Settings, MessageCircle, BarChart3,
   CreditCard, Bell, Search, FolderKanban, BookOpen, Ticket, Grid3X3,
@@ -25,6 +25,7 @@ interface Props {
   icons: IconConfig
   iconMeta: { id: string; label: string; lucideName: string }[]
   logo?: ThemeLogo
+  headerActions?: ReactNode
 }
 
 function LogoRenderer({ logo }: { logo?: ThemeLogo }) {
@@ -39,7 +40,7 @@ function LogoRenderer({ logo }: { logo?: ThemeLogo }) {
   )
 }
 
-export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta, logo }: Props) {
+export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta, logo, headerActions }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const { props } = sidebarConfig
   const activeIcons = iconMeta.filter((ic) => icons[ic.id])
@@ -61,6 +62,7 @@ export default function PreviewSidebar({ entry, sidebarConfig, icons, iconMeta, 
             )
           })}
         </nav>
+        {headerActions && <div className="prev-header-bar__actions">{headerActions}</div>}
       </header>
     )
   }
