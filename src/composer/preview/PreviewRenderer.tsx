@@ -11,6 +11,7 @@ import { getSidebarById } from '../registries/sidebar-registry'
 import { iconRegistry } from '../registries/icon-registry'
 import PreviewSidebar from './PreviewSidebar'
 import PreviewChatbot from './PreviewChatbot'
+import PreviewTopBar from './PreviewTopBar'
 
 interface Props {
   config: ProjectConfig
@@ -60,6 +61,7 @@ export default function PreviewRenderer({ config }: Props) {
           />
         )}
         <main className="prev-app__main">
+          <PreviewTopBar sidebarConfig={config.sidebar} />
           <div className="prev-app__content-area">
             <div className="prev-app__page-header">
               <h2>{config.projectName || 'Untitled Project'}</h2>

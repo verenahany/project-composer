@@ -34,6 +34,8 @@ export const sidebarRegistry: SidebarEntry[] = [
       { key: 'showLogo', label: 'Show Logo', type: 'boolean', defaultValue: true },
       { key: 'showVersion', label: 'Show Version', type: 'boolean', defaultValue: true },
       { key: 'brandName', label: 'Brand Name', type: 'string', defaultValue: 'My App' },
+      { key: 'showProfile', label: 'Show Profile', type: 'boolean', defaultValue: false },
+      { key: 'showNotifications', label: 'Show Notifications', type: 'boolean', defaultValue: false },
     ],
   },
   {
@@ -48,6 +50,8 @@ export const sidebarRegistry: SidebarEntry[] = [
       { key: 'showLogo', label: 'Show Logo', type: 'boolean', defaultValue: false },
       { key: 'showVersion', label: 'Show Version', type: 'boolean', defaultValue: false },
       { key: 'brandName', label: 'Brand Name', type: 'string', defaultValue: '' },
+      { key: 'showProfile', label: 'Show Profile', type: 'boolean', defaultValue: false },
+      { key: 'showNotifications', label: 'Show Notifications', type: 'boolean', defaultValue: false },
     ],
   },
   {
@@ -62,6 +66,8 @@ export const sidebarRegistry: SidebarEntry[] = [
       { key: 'showLogo', label: 'Show Logo', type: 'boolean', defaultValue: true },
       { key: 'showVersion', label: 'Show Version', type: 'boolean', defaultValue: false },
       { key: 'brandName', label: 'Brand Name', type: 'string', defaultValue: 'My App' },
+      { key: 'showProfile', label: 'Show Profile', type: 'boolean', defaultValue: false },
+      { key: 'showNotifications', label: 'Show Notifications', type: 'boolean', defaultValue: false },
     ],
   },
 ]

@@ -522,3 +522,313 @@
   color: var(--composer-foreground);
   border-color: var(--composer-border);
 }
+
+/* ===================================================================
+   Top Bar — notification bell + profile dropdown (preview)
+   =================================================================== */
+
+.prev-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--composer-border);
+  background: var(--composer-card, #fff);
+}
+
+.prev-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Notification bell ─────────────────────────────────── */
+
+.prev-topbar__bell-wrap {
+  position: relative;
+}
+
+.prev-topbar__bell-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--composer-foreground);
+  cursor: pointer;
+}
+
+.prev-topbar__bell-btn:hover {
+  background: var(--composer-muted);
+}
+
+.prev-topbar__bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.prev-topbar__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.prev-topbar__notif-dropdown {
+  position: absolute;
+  right: 0;
+  top: 34px;
+  z-index: 50;
+  width: 240px;
+  max-height: 260px;
+  background: var(--composer-card, #fff);
+  border: 1px solid var(--composer-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.prev-topbar__notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--composer-border);
+}
+
+.prev-topbar__notif-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--composer-foreground);
+}
+
+.prev-topbar__notif-action {
+  font-size: 10px;
+  color: var(--composer-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.prev-topbar__notif-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.prev-topbar__notif-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--composer-border);
+  cursor: pointer;
+}
+
+.prev-topbar__notif-item:last-child {
+  border-bottom: none;
+}
+
+.prev-topbar__notif-item:hover {
+  background: var(--composer-muted);
+}
+
+.prev-topbar__notif-item--unread {
+  border-left: 3px solid var(--composer-primary);
+}
+
+.prev-topbar__notif-item-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.prev-topbar__notif-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.prev-topbar__notif-badge--task { background: var(--composer-primary); }
+.prev-topbar__notif-badge--project { background: #8b5cf6; }
+.prev-topbar__notif-badge--document { background: #14b8a6; }
+.prev-topbar__notif-badge--report { background: #f59e0b; }
+
+.prev-topbar__notif-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--composer-primary);
+  flex-shrink: 0;
+}
+
+.prev-topbar__notif-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--composer-foreground);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.prev-topbar__notif-time {
+  font-size: 9px;
+  color: var(--composer-muted-foreground);
+}
+
+/* ── Profile dropdown ──────────────────────────────────── */
+
+.prev-topbar__profile-wrap {
+  position: relative;
+}
+
+.prev-topbar__profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--composer-foreground);
+  cursor: pointer;
+}
+
+.prev-topbar__profile-btn:hover {
+  background: var(--composer-muted);
+}
+
+.prev-topbar__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--composer-primary) 15%, transparent);
+  color: var(--composer-primary);
+  flex-shrink: 0;
+}
+
+.prev-topbar__user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.prev-topbar__user-name {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.prev-topbar__user-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: var(--composer-muted-foreground);
+}
+
+.prev-topbar__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.prev-topbar__status-dot--online { background: #22c55e; }
+.prev-topbar__status-dot--away { background: #eab308; }
+.prev-topbar__status-dot--busy { background: #ef4444; }
+
+.prev-topbar__profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: 34px;
+  z-index: 50;
+  width: 200px;
+  background: var(--composer-card, #fff);
+  border: 1px solid var(--composer-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px 0;
+}
+
+.prev-topbar__profile-header {
+  padding: 8px 12px;
+}
+
+.prev-topbar__profile-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--composer-foreground);
+  margin: 0;
+}
+
+.prev-topbar__profile-email {
+  font-size: 10px;
+  color: var(--composer-muted-foreground);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prev-topbar__profile-divider {
+  height: 1px;
+  background: var(--composer-border);
+  margin: 4px 0;
+}
+
+.prev-topbar__profile-meta {
+  padding: 3px 12px;
+  font-size: 10px;
+  color: var(--composer-muted-foreground);
+}
+
+.prev-topbar__profile-meta strong {
+  color: var(--composer-foreground);
+}
+
+.prev-topbar__profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: var(--composer-foreground);
+  cursor: pointer;
+  text-align: left;
+}
+
+.prev-topbar__profile-menu-item:hover {
+  background: var(--composer-muted);
+}
+
+.prev-topbar__profile-menu-item--danger {
+  color: #ef4444;
+}

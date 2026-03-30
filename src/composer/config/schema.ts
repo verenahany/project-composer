@@ -14,6 +14,8 @@ export interface SidebarConfig {
     showLogo: boolean
     showVersion: boolean
     brandName: string
+    showProfile: boolean
+    showNotifications: boolean
   }
 }
 
@@ -60,6 +62,8 @@ export function createDefaultConfig(): ProjectConfig {
         showLogo: true,
         showVersion: true,
         brandName: 'My App',
+        showProfile: false,
+        showNotifications: false,
       },
     },
     chatbot: {

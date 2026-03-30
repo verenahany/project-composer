@@ -13,6 +13,7 @@ import { buildChatbotComponent } from './templates/chatbot-template'
 import { buildAppComponent } from './templates/app-template'
 import { buildThemeCss } from './templates/theme-template'
 import { buildComponentsCss } from './templates/components-css-template'
+import { buildTopBarComponent } from './templates/topbar-template'
 
 export interface GeneratedFile {
   path: string
@@ -47,6 +48,11 @@ export async function buildProjectFiles(config: ProjectConfig): Promise<Generate
     { path: 'src/components/Sidebar.tsx', content: buildSidebarComponent(config, sidebar?.variant ?? 'vertical', activeIcons) },
     { path: 'src/components/Chatbot.tsx', content: buildChatbotComponent(config) },
   ]
+
+  const hasTopBar = config.sidebar.props.showProfile || config.sidebar.props.showNotifications
+  if (hasTopBar) {
+    files.push({ path: 'src/components/TopBar.tsx', content: buildTopBarComponent(config) })
+  }
 
   // Fetch the logo image and include it as a binary file in public/
   if (theme) {
