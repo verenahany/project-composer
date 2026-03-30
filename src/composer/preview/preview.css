@@ -426,6 +426,14 @@
   color: var(--composer-primary-foreground, #ffffff);
 }
 
+/* ── Bubble wrap (holds bubble + feedback actions) ─────────────────── */
+
+.prev-chat__bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 /* ── Chat input ────────────────────────────────────────────────────── */
 
 .prev-chat__input-area {

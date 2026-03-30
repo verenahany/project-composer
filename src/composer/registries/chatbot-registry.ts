@@ -19,6 +19,14 @@ export interface ChatbotEntry {
   configurableProps: ChatbotPropDef[]
 }
 
+const SHARED_INPUT_PROPS: ChatbotPropDef[] = [
+  { key: 'showMic', label: 'Mic (Voice Input)', type: 'boolean', defaultValue: false },
+  { key: 'showFeedback', label: 'Feedback (Copy/Thumbs/Regen)', type: 'boolean', defaultValue: false },
+  { key: 'showWebSearch', label: 'Web Search Toggle', type: 'boolean', defaultValue: false },
+  { key: 'showNewChat', label: 'New Chat Button', type: 'boolean', defaultValue: false },
+  { key: 'showConfigButton', label: 'Config Popover', type: 'boolean', defaultValue: false },
+]
+
 export const chatbotRegistry: ChatbotEntry[] = [
   {
     id: 'chatbot-haive',
@@ -31,6 +39,7 @@ export const chatbotRegistry: ChatbotEntry[] = [
       { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
       { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: true },
       { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: true },
+      ...SHARED_INPUT_PROPS,
     ],
   },
   {
@@ -44,6 +53,7 @@ export const chatbotRegistry: ChatbotEntry[] = [
       { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
       { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: false },
       { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: true },
+      ...SHARED_INPUT_PROPS,
     ],
   },
   {
@@ -57,6 +67,7 @@ export const chatbotRegistry: ChatbotEntry[] = [
       { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
       { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: true },
       { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: false },
+      ...SHARED_INPUT_PROPS,
     ],
   },
   {

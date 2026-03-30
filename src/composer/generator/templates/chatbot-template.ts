@@ -16,161 +16,52 @@ export function buildChatbotComponent(config: ProjectConfig): string {
 
 type ChatProps = ProjectConfig['chatbot']['props']
 
-function buildHaiveChat(props: ChatProps): string {
-  return `import { MessageCircle, Send, Bot, User } from 'lucide-react'
-
-const MESSAGES = [
-  { id: 1, role: 'assistant' as const, text: 'Hello! How can I help you today?', time: '10:30' },
-  { id: 2, role: 'user' as const, text: 'I need help with my account settings.', time: '10:31' },
-  { id: 3, role: 'assistant' as const, text: 'Sure! I can help you with that. What would you like to change?', time: '10:31' },
-  { id: 4, role: 'user' as const, text: 'I want to update my notification preferences.', time: '10:32' },
-]
-
-export default function Chatbot() {
-  return (
-    <div className="chat chat--haive">
-      ${props.showHeader ? `<div className="chat__header">
-        <MessageCircle size={16} />
-        <span>Chat</span>
-      </div>` : ''}
-      <div className="chat__messages">
-        {MESSAGES.map((msg) => (
-          <div key={msg.id} className={\`chat__row chat__row--\${msg.role}\`}>
-            ${props.showAvatar ? `<span className={\`chat__avatar chat__avatar--\${msg.role}\`}>
-              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
-            </span>` : ''}
-            <div className={\`chat__bubble chat__bubble--\${msg.role}\`}>
-              <p>{msg.text}</p>
-              ${props.showTimestamps ? '<span className="chat__time">{msg.time}</span>' : ''}
-            </div>
-          </div>
-        ))}
-      </div>
-      ${props.showInput ? `<div className="chat__input-area">
-        <input className="chat__input" placeholder="Type a message..." />
-        <button className="chat__send"><Send size={14} /></button>
-      </div>` : ''}
-    </div>
-  )
-}
-`
+function collectIcons(props: ChatProps, base: string[]): string {
+  const icons = [...base]
+  if (props.showMic) icons.push('Mic', 'MicOff')
+  if (props.showFeedback) icons.push('Copy', 'ThumbsUp', 'ThumbsDown', 'RefreshCcw')
+  if (props.showWebSearch) icons.push('Globe')
+  if (props.showConfigButton) icons.push('Settings2')
+  if (props.showNewChat) icons.push('MessageSquarePlus')
+  return [...new Set(icons)].join(', ')
 }
 
-function buildBubblesChat(props: ChatProps): string {
-  return `import { MessageCircle } from 'lucide-react'
-
-const MESSAGES = [
-  { id: 1, sender: 'bot' as const, badge: 'IP', name: 'InstaPay', text: 'Welcome! How may I assist you?', time: '09:15' },
-  { id: 2, sender: 'customer' as const, badge: 'CU', name: 'Customer', text: 'I have a question about my recent transaction.', time: '09:16' },
-  { id: 3, sender: 'bot' as const, badge: 'IP', name: 'InstaPay', text: 'Of course! Let me look into that for you.', time: '09:16' },
-  { id: 4, sender: 'agent' as const, badge: 'CC', name: 'CC Agent', text: 'I can see the transaction. Let me check the status.', time: '09:18' },
-]
-
-export default function Chatbot() {
-  return (
-    <div className="chat chat--bubbles">
-      ${props.showHeader ? `<div className="chat__header">
-        <MessageCircle size={16} />
-        <span>Conversation</span>
-      </div>` : ''}
-      <div className="chat__messages">
-        {MESSAGES.map((msg) => (
-          <div key={msg.id} className={\`chat__bubble-row chat__bubble-row--\${msg.sender}\`}>
-            ${props.showAvatar ? `<span className={\`chat__badge chat__badge--\${msg.sender}\`}>{msg.badge}</span>` : ''}
-            <div className="chat__bubble-content">
-              <span className="chat__sender">{msg.name}</span>
-              <div className={\`chat__bubble chat__bubble--\${msg.sender}\`}>
-                <p>{msg.text}</p>
-              </div>
-              ${props.showTimestamps ? '<span className="chat__time">{msg.time}</span>' : ''}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-`
+function needsState(props: ChatProps): boolean {
+  return props.showMic || props.showFeedback || props.showWebSearch || props.showNewChat || props.showConfigButton
 }
 
-function buildPresentationChat(props: ChatProps): string {
-  const extraIcons: string[] = []
-  if (props.showMic) extraIcons.push('Mic', 'MicOff')
-  if (props.showFeedback) extraIcons.push('Copy', 'ThumbsUp', 'ThumbsDown', 'RefreshCcw')
-  if (props.showWebSearch) extraIcons.push('Globe')
-  if (props.showConfigButton) extraIcons.push('Settings2')
-  if (props.showNewChat) extraIcons.push('MessageSquarePlus')
-  const iconImports = ['Bot', 'User', 'Send', ...extraIcons].join(', ')
-
-  return `import { useState, useRef, useEffect } from 'react'
-import { ${iconImports} } from 'lucide-react'
-
-const MESSAGES = [
-  { id: 1, role: 'assistant' as const, text: 'How can I help you today?' },
-  { id: 2, role: 'user' as const, text: 'I need a presentation about AI trends in 2026.' },
-  { id: 3, role: 'assistant' as const, text: "Great topic! I'll cover the latest developments in generative AI, autonomous agents, and multimodal models. How many slides would you like?" },
-  { id: 4, role: 'user' as const, text: 'Around 12 slides, keep it concise.' },
-]
-
-export default function Chatbot() {
-  const [input, setInput] = useState('')
-  ${props.showMic ? MIC_STATE_BLOCK : ''}
-
-  return (
-    <div className="pres-chat">
-      ${props.showHeader ? `<div className="pres-chat__header">
-        <Bot size={18} />
-        <span>Presentation AI</span>
-        <span className="pres-chat__status-dot" />
-      </div>` : ''}
-
-      <div className="pres-chat__messages">
-        {MESSAGES.map((msg) => (
-          <div key={msg.id} className={\`pres-chat__msg pres-chat__msg--\${msg.role}\`}>
-            ${props.showAvatar ? `<span className={\`pres-chat__avatar pres-chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
-              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
-            </span>` : ''}
-            <div className={\`pres-chat__content pres-chat__content--\${msg.role}\`}>
-              <div className={\`pres-chat__bubble pres-chat__bubble--\${msg.role}\`}>
-                <p>{msg.text}</p>
-              </div>
-              ${props.showFeedback ? `{msg.role === 'user' && (
+function buildFeedbackJsx(role: string): string {
+  return `{${role} === 'user' && (
                 <div className="pres-chat__actions pres-chat__actions--end">
                   <button className="pres-chat__action-btn" title="Copy"><Copy size={12} /></button>
                 </div>
               )}
-              {msg.role === 'assistant' && (
+              {${role} === 'assistant' && (
                 <div className="pres-chat__actions">
                   <button className="pres-chat__action-btn" title="Copy"><Copy size={12} /></button>
                   <button className="pres-chat__action-btn" title="Good response"><ThumbsUp size={12} /></button>
                   <button className="pres-chat__action-btn" title="Bad response"><ThumbsDown size={12} /></button>
                   <button className="pres-chat__action-btn" title="Regenerate"><RefreshCcw size={12} /></button>
                 </div>
-              )}` : ''}
-            </div>
-          </div>
-        ))}
+              )}`
+}
 
-        <div className="pres-chat__msg pres-chat__msg--assistant">
-          ${props.showAvatar ? `<span className="pres-chat__avatar pres-chat__avatar--bot"><Bot size={14} /></span>` : ''}
-          <div className="pres-chat__content pres-chat__content--assistant">
-            <div className="pres-chat__bubble pres-chat__bubble--assistant pres-chat__bubble--typing">
-              <span className="pres-chat__dots"><span /><span /><span /></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      ${props.showInput ? `<div className="pres-chat__input-wrap">
+function buildEnhancedInputBar(props: ChatProps, placeholder: string): string {
+  const hasToolbar = props.showMic || props.showWebSearch || props.showNewChat || props.showConfigButton
+  if (!hasToolbar) {
+    return `<div className="chat__input-area">
+        <input className="chat__input" placeholder="${placeholder}" />
+        <button className="chat__send"><Send size={14} /></button>
+      </div>`
+  }
+  return `<div className="pres-chat__input-wrap">
         <textarea
           className="pres-chat__textarea"
-          placeholder="Message Presentation AI..."
+          placeholder="${placeholder}"
           rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') }
-          }}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') } }}
         />
         <div className="pres-chat__toolbar">
           ${props.showConfigButton ? `<button className="pres-chat__tool-btn" title="Chat config"><Settings2 size={14} /></button>` : ''}
@@ -189,7 +80,197 @@ export default function Chatbot() {
             </button>
           </div>
         </div>
+      </div>`
+}
+
+function buildStateBlock(props: ChatProps): string {
+  let s = `const [input, setInput] = useState('')\n`
+  if (props.showMic) s += `  ${MIC_STATE_BLOCK}\n`
+  return s
+}
+
+function buildHaiveChat(props: ChatProps): string {
+  const icons = collectIcons(props, ['MessageCircle', 'Send', 'Bot', 'User'])
+  const hasState = needsState(props)
+  return `${hasState ? `import { useState${props.showMic ? ', useRef, useEffect' : ''} } from 'react'\n` : ''}import { ${icons} } from 'lucide-react'
+
+const MESSAGES = [
+  { id: 1, role: 'assistant' as const, text: 'Hello! How can I help you today?', time: '10:30' },
+  { id: 2, role: 'user' as const, text: 'I need help with my account settings.', time: '10:31' },
+  { id: 3, role: 'assistant' as const, text: 'Sure! I can help you with that. What would you like to change?', time: '10:31' },
+  { id: 4, role: 'user' as const, text: 'I want to update my notification preferences.', time: '10:32' },
+]
+
+export default function Chatbot() {
+  ${hasState ? buildStateBlock(props) : ''}
+  return (
+    <div className="chat chat--haive">
+      ${props.showHeader ? `<div className="chat__header">
+        <MessageCircle size={16} />
+        <span>Chat</span>
       </div>` : ''}
+      <div className="chat__messages">
+        {MESSAGES.map((msg) => (
+          <div key={msg.id} className={\`chat__row chat__row--\${msg.role}\`}>
+            ${props.showAvatar ? `<span className={\`chat__avatar chat__avatar--\${msg.role}\`}>
+              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+            </span>` : ''}
+            <div className="chat__bubble-wrap">
+              <div className={\`chat__bubble chat__bubble--\${msg.role}\`}>
+                <p>{msg.text}</p>
+                ${props.showTimestamps ? '<span className="chat__time">{msg.time}</span>' : ''}
+              </div>
+              ${props.showFeedback ? buildFeedbackJsx('msg.role') : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+      ${props.showInput ? buildEnhancedInputBar(props, 'Type a message...') : ''}
+    </div>
+  )
+}
+`
+}
+
+function buildBubblesChat(props: ChatProps): string {
+  const icons = collectIcons(props, ['MessageCircle', 'Send'])
+  const hasState = needsState(props)
+  return `${hasState ? `import { useState${props.showMic ? ', useRef, useEffect' : ''} } from 'react'\n` : ''}import { ${icons} } from 'lucide-react'
+
+const MESSAGES = [
+  { id: 1, sender: 'bot' as const, role: 'assistant' as const, badge: 'IP', name: 'InstaPay', text: 'Welcome! How may I assist you?', time: '09:15' },
+  { id: 2, sender: 'customer' as const, role: 'user' as const, badge: 'CU', name: 'Customer', text: 'I have a question about my recent transaction.', time: '09:16' },
+  { id: 3, sender: 'bot' as const, role: 'assistant' as const, badge: 'IP', name: 'InstaPay', text: 'Of course! Let me look into that for you.', time: '09:16' },
+  { id: 4, sender: 'agent' as const, role: 'assistant' as const, badge: 'CC', name: 'CC Agent', text: 'I can see the transaction. Let me check the status.', time: '09:18' },
+]
+
+export default function Chatbot() {
+  ${hasState ? buildStateBlock(props) : ''}
+  return (
+    <div className="chat chat--bubbles">
+      ${props.showHeader ? `<div className="chat__header">
+        <MessageCircle size={16} />
+        <span>Conversation</span>
+      </div>` : ''}
+      <div className="chat__messages">
+        {MESSAGES.map((msg) => (
+          <div key={msg.id} className={\`chat__bubble-row chat__bubble-row--\${msg.sender}\`}>
+            ${props.showAvatar ? `<span className={\`chat__badge chat__badge--\${msg.sender}\`}>{msg.badge}</span>` : ''}
+            <div className="chat__bubble-content">
+              <span className="chat__sender">{msg.name}</span>
+              <div className={\`chat__bubble chat__bubble--\${msg.sender}\`}>
+                <p>{msg.text}</p>
+              </div>
+              ${props.showTimestamps ? '<span className="chat__time">{msg.time}</span>' : ''}
+              ${props.showFeedback ? buildFeedbackJsx('msg.role') : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+      ${props.showInput ? buildEnhancedInputBar(props, 'Type a message...') : ''}
+    </div>
+  )
+}
+`
+}
+
+function buildPresentationChat(props: ChatProps): string {
+  const icons = collectIcons(props, ['Bot', 'User', 'Send'])
+  return `import { useState${props.showMic ? ', useRef, useEffect' : ''} } from 'react'
+import { ${icons} } from 'lucide-react'
+
+const MESSAGES = [
+  { id: 1, role: 'assistant' as const, text: 'How can I help you today?' },
+  { id: 2, role: 'user' as const, text: 'I need a presentation about AI trends in 2026.' },
+  { id: 3, role: 'assistant' as const, text: "Great topic! I'll cover the latest developments in generative AI, autonomous agents, and multimodal models. How many slides would you like?" },
+  { id: 4, role: 'user' as const, text: 'Around 12 slides, keep it concise.' },
+]
+
+export default function Chatbot() {
+  ${buildStateBlock(props)}
+  return (
+    <div className="pres-chat">
+      ${props.showHeader ? `<div className="pres-chat__header">
+        <Bot size={18} />
+        <span>Presentation AI</span>
+        <span className="pres-chat__status-dot" />
+      </div>` : ''}
+
+      <div className="pres-chat__messages">
+        {MESSAGES.map((msg) => (
+          <div key={msg.id} className={\`pres-chat__msg pres-chat__msg--\${msg.role}\`}>
+            ${props.showAvatar ? `<span className={\`pres-chat__avatar pres-chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
+              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+            </span>` : ''}
+            <div className={\`pres-chat__content pres-chat__content--\${msg.role}\`}>
+              <div className={\`pres-chat__bubble pres-chat__bubble--\${msg.role}\`}>
+                <p>{msg.text}</p>
+              </div>
+              ${props.showFeedback ? buildFeedbackJsx('msg.role') : ''}
+            </div>
+          </div>
+        ))}
+
+        <div className="pres-chat__msg pres-chat__msg--assistant">
+          ${props.showAvatar ? `<span className="pres-chat__avatar pres-chat__avatar--bot"><Bot size={14} /></span>` : ''}
+          <div className="pres-chat__content pres-chat__content--assistant">
+            <div className="pres-chat__bubble pres-chat__bubble--assistant pres-chat__bubble--typing">
+              <span className="pres-chat__dots"><span /><span /><span /></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      ${props.showInput ? buildEnhancedInputBar(props, 'Message Presentation AI...') : ''}
+    </div>
+  )
+}
+`
+}
+
+function buildSupportChat(props: ChatProps): string {
+  const icons = collectIcons(props, ['Bot', 'User', 'Send'])
+  const hasState = needsState(props)
+  return `${hasState ? `import { useState${props.showMic ? ', useRef, useEffect' : ''} } from 'react'\n` : ''}import { ${icons} } from 'lucide-react'
+
+const MESSAGES = [
+  { id: 1, role: 'assistant' as const, text: 'Hello! How can I help you today?', time: '10:30' },
+  { id: 2, role: 'user' as const, text: 'I need help with my account settings.', time: '10:31' },
+  { id: 3, role: 'assistant' as const, text: 'Sure! I can help you with that. What would you like to change?', time: '10:31' },
+  { id: 4, role: 'user' as const, text: 'I want to update my notification preferences.', time: '10:32' },
+]
+
+export default function Chatbot() {
+  ${hasState ? buildStateBlock(props) : ''}
+  return (
+    <div className="chat chat--support">
+      ${props.showHeader ? `<div className="chat__header">
+        <Bot size={16} />
+        <span>AI Assistant</span>
+        <span className="chat__status-dot" />
+      </div>` : ''}
+      <div className="chat__messages">
+        {MESSAGES.map((msg) => (
+          <div key={msg.id} className={\`chat__row chat__row--\${msg.role}\`}>
+            ${props.showAvatar ? `<span className={\`chat__avatar chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
+              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+            </span>` : ''}
+            <div className="chat__bubble-wrap">
+              <div className={\`chat__bubble chat__bubble--\${msg.role}\`}>
+                <p>{msg.text}</p>
+              </div>
+              ${props.showFeedback ? buildFeedbackJsx('msg.role') : ''}
+            </div>
+          </div>
+        ))}
+        <div className="chat__row chat__row--assistant">
+          ${props.showAvatar ? `<span className="chat__avatar chat__avatar--bot"><Bot size={14} /></span>` : ''}
+          <div className="chat__bubble chat__bubble--assistant chat__bubble--typing">
+            <span className="chat__dots"><span /><span /><span /></span>
+          </div>
+        </div>
+      </div>
+      ${props.showInput ? buildEnhancedInputBar(props, 'Ask anything...') : ''}
     </div>
   )
 }
@@ -244,51 +325,3 @@ const MIC_STATE_BLOCK = `const [isListening, setIsListening] = useState(false)
   }
 
   useEffect(() => { return () => { try { (recognitionRef.current as { stop(): void })?.stop?.() } catch {} } }, [])`
-
-function buildSupportChat(props: ChatProps): string {
-  return `import { Bot, User, Send } from 'lucide-react'
-
-const MESSAGES = [
-  { id: 1, role: 'assistant' as const, text: 'Hello! How can I help you today?', time: '10:30' },
-  { id: 2, role: 'user' as const, text: 'I need help with my account settings.', time: '10:31' },
-  { id: 3, role: 'assistant' as const, text: 'Sure! I can help you with that. What would you like to change?', time: '10:31' },
-  { id: 4, role: 'user' as const, text: 'I want to update my notification preferences.', time: '10:32' },
-]
-
-export default function Chatbot() {
-  return (
-    <div className="chat chat--support">
-      ${props.showHeader ? `<div className="chat__header">
-        <Bot size={16} />
-        <span>AI Assistant</span>
-        <span className="chat__status-dot" />
-      </div>` : ''}
-      <div className="chat__messages">
-        {MESSAGES.map((msg) => (
-          <div key={msg.id} className={\`chat__row chat__row--\${msg.role}\`}>
-            ${props.showAvatar ? `<span className={\`chat__avatar chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
-              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
-            </span>` : ''}
-            <div className={\`chat__bubble chat__bubble--\${msg.role}\`}>
-              <p>{msg.text}</p>
-            </div>
-          </div>
-        ))}
-        <div className="chat__row chat__row--assistant">
-          ${props.showAvatar ? `<span className="chat__avatar chat__avatar--bot"><Bot size={14} /></span>` : ''}
-          <div className="chat__bubble chat__bubble--assistant chat__bubble--typing">
-            <span className="chat__dots">
-              <span /><span /><span />
-            </span>
-          </div>
-        </div>
-      </div>
-      ${props.showInput ? `<div className="chat__input-area">
-        <input className="chat__input" placeholder="Ask anything..." />
-        <button className="chat__send"><Send size={14} /></button>
-      </div>` : ''}
-    </div>
-  )
-}
-`
-}

@@ -383,6 +383,13 @@ export function buildComponentsCss(): string {
   color: var(--composer-primary-foreground);
 }
 
+/* Bubble wrap (holds bubble + feedback actions) */
+.chat__bubble-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 /* Chat input */
 .chat__input-area {
   display: flex;
@@ -422,79 +429,6 @@ export function buildComponentsCss(): string {
 
 .chat__send:hover {
   opacity: 0.9;
-}
-
-/* ── Presentation AI chat input bar ─────────────────── */
-
-.chat__pres-input-bar {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--composer-border);
-  border-radius: 0 0 12px 12px;
-  background: var(--composer-muted);
-}
-
-.chat__pres-textarea {
-  width: 100%;
-  min-height: 42px;
-  max-height: 120px;
-  resize: none;
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--composer-foreground);
-  outline: none;
-}
-
-.chat__pres-textarea::placeholder {
-  color: var(--composer-muted-foreground);
-}
-
-.chat__pres-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 4px 12px 10px;
-}
-
-.chat__pres-mic,
-.chat__pres-send {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--composer-border);
-  cursor: pointer;
-  transition: background 150ms;
-}
-
-.chat__pres-mic {
-  background: var(--composer-card);
-  color: var(--composer-foreground);
-}
-
-.chat__pres-mic:hover {
-  background: var(--composer-muted);
-}
-
-.chat__pres-mic--active {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.4);
-}
-
-.chat__pres-send {
-  background: var(--composer-card);
-  color: var(--composer-foreground);
-}
-
-.chat__pres-send:hover {
-  background: var(--composer-muted);
 }
 
 /* ===================================================================

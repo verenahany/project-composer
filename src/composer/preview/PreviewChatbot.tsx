@@ -1,7 +1,6 @@
 /**
  * Preview chatbot — renders a chat UI variant inside the composer preview area.
- * Adapted from GoAI HAIVE ChatInterface and insta_sentiment ChatBubbles.
- * Uses composer CSS variables for theming.
+ * All variants share the enhanced input bar and feedback actions from Presentation AI.
  */
 
 import type { FC } from 'react'
@@ -16,12 +15,80 @@ interface Props {
   chatbotConfig: ChatbotConfig
 }
 
+type ChatProps = ChatbotConfig['props']
+
 const DEMO_MESSAGES = [
   { id: 1, role: 'assistant' as const, text: 'Hello! How can I help you today?', time: '10:30' },
   { id: 2, role: 'user' as const, text: 'I need help with my account settings.', time: '10:31' },
   { id: 3, role: 'assistant' as const, text: 'Sure! I can help you with that. What would you like to change?', time: '10:31' },
   { id: 4, role: 'user' as const, text: 'I want to update my notification preferences.', time: '10:32' },
 ]
+
+/* ── Shared feedback actions (used by all variants) ─────────────── */
+
+function FeedbackActions({ role, props }: { role: 'user' | 'assistant'; props: ChatProps }) {
+  if (!props.showFeedback) return null
+  if (role === 'user') {
+    return (
+      <div className="pres-chat__actions pres-chat__actions--end">
+        <button className="pres-chat__action-btn" title="Copy"><Copy size={11} /></button>
+      </div>
+    )
+  }
+  return (
+    <div className="pres-chat__actions">
+      <button className="pres-chat__action-btn" title="Copy"><Copy size={11} /></button>
+      <button className="pres-chat__action-btn" title="Good response"><ThumbsUp size={11} /></button>
+      <button className="pres-chat__action-btn" title="Bad response"><ThumbsDown size={11} /></button>
+      <button className="pres-chat__action-btn" title="Regenerate"><RefreshCcw size={11} /></button>
+    </div>
+  )
+}
+
+/* ── Shared enhanced input bar (used by all variants) ───────────── */
+
+function EnhancedInputBar({ props, placeholder }: { props: ChatProps; placeholder: string }) {
+  const hasToolbar = props.showMic || props.showWebSearch || props.showNewChat || props.showConfigButton
+  if (!props.showInput) return null
+
+  if (!hasToolbar) {
+    return (
+      <div className="prev-chat__input-area">
+        <input className="prev-chat__input" placeholder={placeholder} readOnly />
+        <button className="prev-chat__send"><Send size={14} /></button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pres-chat__input-wrap">
+      <textarea className="pres-chat__textarea" placeholder={placeholder} rows={1} readOnly />
+      <div className="pres-chat__toolbar">
+        {props.showConfigButton && (
+          <button className="pres-chat__tool-btn" title="Chat config"><Settings2 size={13} /></button>
+        )}
+        {props.showWebSearch && (
+          <button className="pres-chat__tool-btn pres-chat__tool-btn--web" title="Web search">
+            <Globe size={13} /><span>Web</span>
+          </button>
+        )}
+        <div className="pres-chat__toolbar-right">
+          {props.showNewChat && (
+            <button className="pres-chat__new-chat-btn" title="New chat">
+              <MessageSquarePlus size={12} /><span>New chat</span>
+            </button>
+          )}
+          {props.showMic && (
+            <button className="pres-chat__circle-btn" title="Voice input"><MicOff size={13} /></button>
+          )}
+          <button className="pres-chat__circle-btn" title="Send"><Send size={13} /></button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── HAIVE Chat ─────────────────────────────────────────────────── */
 
 function HaiveChat({ chatbotConfig }: Props) {
   const { props } = chatbotConfig
@@ -42,31 +109,31 @@ function HaiveChat({ chatbotConfig }: Props) {
                 {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
               </span>
             )}
-            <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
-              <p>{msg.text}</p>
-              {props.showTimestamps && <span className="prev-chat__time">{msg.time}</span>}
+            <div className="prev-chat__bubble-wrap">
+              <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
+                <p>{msg.text}</p>
+                {props.showTimestamps && <span className="prev-chat__time">{msg.time}</span>}
+              </div>
+              <FeedbackActions role={msg.role} props={props} />
             </div>
           </div>
         ))}
       </div>
-      {props.showInput && (
-        <div className="prev-chat__input-area">
-          <input className="prev-chat__input" placeholder="Type a message..." readOnly />
-          <button className="prev-chat__send"><Send size={14} /></button>
-        </div>
-      )}
+      <EnhancedInputBar props={props} placeholder="Type a message..." />
     </div>
   )
 }
+
+/* ── WhatsApp Bubbles ───────────────────────────────────────────── */
 
 function BubblesChat({ chatbotConfig }: Props) {
   const { props } = chatbotConfig
 
   const bubbleMessages = [
-    { id: 1, sender: 'bot' as const, badge: 'IP', name: 'InstaPay', text: 'Welcome! How may I assist you?', time: '09:15' },
-    { id: 2, sender: 'customer' as const, badge: 'CU', name: 'Customer', text: 'I have a question about my recent transaction.', time: '09:16' },
-    { id: 3, sender: 'bot' as const, badge: 'IP', name: 'InstaPay', text: 'Of course! Let me look into that for you.', time: '09:16' },
-    { id: 4, sender: 'agent' as const, badge: 'CC', name: 'CC Agent', text: 'I can see the transaction. Let me check the status.', time: '09:18' },
+    { id: 1, sender: 'bot' as const, role: 'assistant' as const, badge: 'IP', name: 'InstaPay', text: 'Welcome! How may I assist you?', time: '09:15' },
+    { id: 2, sender: 'customer' as const, role: 'user' as const, badge: 'CU', name: 'Customer', text: 'I have a question about my recent transaction.', time: '09:16' },
+    { id: 3, sender: 'bot' as const, role: 'assistant' as const, badge: 'IP', name: 'InstaPay', text: 'Of course! Let me look into that for you.', time: '09:16' },
+    { id: 4, sender: 'agent' as const, role: 'assistant' as const, badge: 'CC', name: 'CC Agent', text: 'I can see the transaction. Let me check the status.', time: '09:18' },
   ]
 
   return (
@@ -89,13 +156,17 @@ function BubblesChat({ chatbotConfig }: Props) {
                 <p>{msg.text}</p>
               </div>
               {props.showTimestamps && <span className="prev-chat__time">{msg.time}</span>}
+              <FeedbackActions role={msg.role} props={props} />
             </div>
           </div>
         ))}
       </div>
+      <EnhancedInputBar props={props} placeholder="Type a message..." />
     </div>
   )
 }
+
+/* ── Support Assistant ──────────────────────────────────────────── */
 
 function SupportChat({ chatbotConfig }: Props) {
   const { props } = chatbotConfig
@@ -117,8 +188,11 @@ function SupportChat({ chatbotConfig }: Props) {
                 {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
               </span>
             )}
-            <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
-              <p>{msg.text}</p>
+            <div className="prev-chat__bubble-wrap">
+              <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
+                <p>{msg.text}</p>
+              </div>
+              <FeedbackActions role={msg.role} props={props} />
             </div>
           </div>
         ))}
@@ -127,18 +201,11 @@ function SupportChat({ chatbotConfig }: Props) {
             <span className="prev-chat__avatar prev-chat__avatar--bot"><Bot size={14} /></span>
           )}
           <div className="prev-chat__bubble prev-chat__bubble--assistant prev-chat__bubble--typing">
-            <span className="prev-chat__dots">
-              <span /><span /><span />
-            </span>
+            <span className="prev-chat__dots"><span /><span /><span /></span>
           </div>
         </div>
       </div>
-      {props.showInput && (
-        <div className="prev-chat__input-area">
-          <input className="prev-chat__input" placeholder="Ask anything..." readOnly />
-          <button className="prev-chat__send"><Send size={14} /></button>
-        </div>
-      )}
+      <EnhancedInputBar props={props} placeholder="Ask anything..." />
     </div>
   )
 }
