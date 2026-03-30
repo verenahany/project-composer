@@ -94,9 +94,16 @@ export default function Chatbot() {
 }
 
 function buildPresentationChat(props: ChatProps): string {
-  const micImport = props.showMic ? ', Mic, MicOff' : ''
+  const extraIcons: string[] = []
+  if (props.showMic) extraIcons.push('Mic', 'MicOff')
+  if (props.showFeedback) extraIcons.push('Copy', 'ThumbsUp', 'ThumbsDown', 'RefreshCcw')
+  if (props.showWebSearch) extraIcons.push('Globe')
+  if (props.showConfigButton) extraIcons.push('Settings2')
+  if (props.showNewChat) extraIcons.push('MessageSquarePlus')
+  const iconImports = ['Bot', 'User', 'Send', ...extraIcons].join(', ')
+
   return `import { useState, useRef, useEffect } from 'react'
-import { Bot, User, Send${micImport} } from 'lucide-react'
+import { ${iconImports} } from 'lucide-react'
 
 const MESSAGES = [
   { id: 1, role: 'assistant' as const, text: 'How can I help you today?' },
@@ -107,7 +114,89 @@ const MESSAGES = [
 
 export default function Chatbot() {
   const [input, setInput] = useState('')
-  ${props.showMic ? `const [isListening, setIsListening] = useState(false)
+  ${props.showMic ? MIC_STATE_BLOCK : ''}
+
+  return (
+    <div className="pres-chat">
+      ${props.showHeader ? `<div className="pres-chat__header">
+        <Bot size={18} />
+        <span>Presentation AI</span>
+        <span className="pres-chat__status-dot" />
+      </div>` : ''}
+
+      <div className="pres-chat__messages">
+        {MESSAGES.map((msg) => (
+          <div key={msg.id} className={\`pres-chat__msg pres-chat__msg--\${msg.role}\`}>
+            ${props.showAvatar ? `<span className={\`pres-chat__avatar pres-chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
+              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+            </span>` : ''}
+            <div className={\`pres-chat__content pres-chat__content--\${msg.role}\`}>
+              <div className={\`pres-chat__bubble pres-chat__bubble--\${msg.role}\`}>
+                <p>{msg.text}</p>
+              </div>
+              ${props.showFeedback ? `{msg.role === 'user' && (
+                <div className="pres-chat__actions pres-chat__actions--end">
+                  <button className="pres-chat__action-btn" title="Copy"><Copy size={12} /></button>
+                </div>
+              )}
+              {msg.role === 'assistant' && (
+                <div className="pres-chat__actions">
+                  <button className="pres-chat__action-btn" title="Copy"><Copy size={12} /></button>
+                  <button className="pres-chat__action-btn" title="Good response"><ThumbsUp size={12} /></button>
+                  <button className="pres-chat__action-btn" title="Bad response"><ThumbsDown size={12} /></button>
+                  <button className="pres-chat__action-btn" title="Regenerate"><RefreshCcw size={12} /></button>
+                </div>
+              )}` : ''}
+            </div>
+          </div>
+        ))}
+
+        <div className="pres-chat__msg pres-chat__msg--assistant">
+          ${props.showAvatar ? `<span className="pres-chat__avatar pres-chat__avatar--bot"><Bot size={14} /></span>` : ''}
+          <div className="pres-chat__content pres-chat__content--assistant">
+            <div className="pres-chat__bubble pres-chat__bubble--assistant pres-chat__bubble--typing">
+              <span className="pres-chat__dots"><span /><span /><span /></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      ${props.showInput ? `<div className="pres-chat__input-wrap">
+        <textarea
+          className="pres-chat__textarea"
+          placeholder="Message Presentation AI..."
+          rows={1}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') }
+          }}
+        />
+        <div className="pres-chat__toolbar">
+          ${props.showConfigButton ? `<button className="pres-chat__tool-btn" title="Chat config"><Settings2 size={14} /></button>` : ''}
+          ${props.showWebSearch ? `<button className="pres-chat__tool-btn pres-chat__tool-btn--web" title="Web search"><Globe size={14} /><span>Web</span></button>` : ''}
+          <div className="pres-chat__toolbar-right">
+            ${props.showNewChat ? `<button className="pres-chat__new-chat-btn"><MessageSquarePlus size={13} /><span>New chat</span></button>` : ''}
+            ${props.showMic ? `<button
+              className={\`pres-chat__circle-btn \${isListening ? 'pres-chat__circle-btn--active' : ''}\`}
+              title={isListening ? 'Stop recording' : 'Voice input'}
+              onClick={handleMicClick}
+            >
+              {isListening ? <Mic size={14} /> : <MicOff size={14} />}
+            </button>` : ''}
+            <button className="pres-chat__circle-btn" title="Send" onClick={() => setInput('')}>
+              <Send size={14} />
+            </button>
+          </div>
+        </div>
+      </div>` : ''}
+    </div>
+  )
+}
+`
+}
+
+const MIC_STATE_BLOCK = `const [isListening, setIsListening] = useState(false)
   const recognitionRef = useRef<unknown>(null)
   const stoppedRef = useRef(false)
 
@@ -154,62 +243,7 @@ export default function Chatbot() {
     rec.start()
   }
 
-  useEffect(() => { return () => { try { (recognitionRef.current as { stop(): void })?.stop?.() } catch {} } }, [])` : ''}
-
-  return (
-    <div className="chat chat--presentation">
-      ${props.showHeader ? `<div className="chat__header">
-        <Bot size={16} />
-        <span>Presentation AI</span>
-        <span className="chat__status-dot" />
-      </div>` : ''}
-      <div className="chat__messages">
-        {MESSAGES.map((msg) => (
-          <div key={msg.id} className={\`chat__row chat__row--\${msg.role}\`}>
-            ${props.showAvatar ? `<span className={\`chat__avatar chat__avatar--\${msg.role === 'assistant' ? 'bot' : 'user'}\`}>
-              {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
-            </span>` : ''}
-            <div className={\`chat__bubble chat__bubble--\${msg.role}\`}>
-              <p>{msg.text}</p>
-            </div>
-          </div>
-        ))}
-        <div className="chat__row chat__row--assistant">
-          ${props.showAvatar ? `<span className="chat__avatar chat__avatar--bot"><Bot size={14} /></span>` : ''}
-          <div className="chat__bubble chat__bubble--assistant chat__bubble--typing">
-            <span className="chat__dots"><span /><span /><span /></span>
-          </div>
-        </div>
-      </div>
-      ${props.showInput ? `<div className="chat__pres-input-bar">
-        <textarea
-          className="chat__pres-textarea"
-          placeholder="Message AI..."
-          rows={1}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); setInput('') }
-          }}
-        />
-        <div className="chat__pres-actions">
-          ${props.showMic ? `<button
-            className={\`chat__pres-mic \${isListening ? 'chat__pres-mic--active' : ''}\`}
-            title={isListening ? 'Stop recording' : 'Voice input'}
-            onClick={handleMicClick}
-          >
-            {isListening ? <Mic size={14} /> : <MicOff size={14} />}
-          </button>` : ''}
-          <button className="chat__pres-send" title="Send" onClick={() => setInput('')}>
-            <Send size={14} />
-          </button>
-        </div>
-      </div>` : ''}
-    </div>
-  )
-}
-`
-}
+  useEffect(() => { return () => { try { (recognitionRef.current as { stop(): void })?.stop?.() } catch {} } }, [])`
 
 function buildSupportChat(props: ChatProps): string {
   return `import { Bot, User, Send } from 'lucide-react'

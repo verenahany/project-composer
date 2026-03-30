@@ -467,6 +467,90 @@
   background: #ffffff;
 }
 
+.preview-panel__fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border-default, #e4deeb);
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--color-surface-default, #ffffff);
+  color: var(--color-text-muted, #68707f);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.preview-panel__fullscreen-btn:hover {
+  background: var(--color-surface-muted, #f7f5fa);
+  border-color: var(--color-brand-secondary, #7d569e);
+  color: var(--color-text-default, #1c1c22);
+}
+
+/* ── Fullscreen preview overlay ───────────────────────────────────── */
+
+.fullprev__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-canvas, #f3f2f7);
+}
+
+.fullprev__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--color-surface-default, #ffffff);
+  border-bottom: 1px solid var(--color-border-default, #e4deeb);
+  flex-shrink: 0;
+}
+
+.fullprev__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-default, #1c1c22);
+}
+
+.fullprev__theme-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--color-brand-primary, #512772);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.fullprev__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border: 1px solid var(--color-border-default, #e4deeb);
+  border-radius: 8px;
+  background: var(--color-surface-default, #ffffff);
+  color: var(--color-text-muted, #68707f);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.fullprev__close:hover {
+  background: var(--color-surface-muted, #f7f5fa);
+  color: var(--color-text-default, #1c1c22);
+}
+
+.fullprev__canvas {
+  flex: 1;
+  overflow: hidden;
+}
+
 /* ── GitHub modal ──────────────────────────────────────────────────── */
 
 .gh-modal__backdrop {

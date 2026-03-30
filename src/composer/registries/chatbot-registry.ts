@@ -63,14 +63,18 @@ export const chatbotRegistry: ChatbotEntry[] = [
     id: 'chatbot-presentation',
     displayName: 'Presentation AI Chat',
     description:
-      'Full chat UI from Presentation AI with auto-growing input, microphone voice-to-text (Web Speech API), send button, streaming dots, and rounded message bubbles.',
+      'Full chat UI from Presentation AI with all original components: feedback buttons, web search, config popover, mic input, new chat, and streaming dots.',
     source: 'presentation-ai/PresentationInput.tsx + PresentationDashboard.tsx',
     configurableProps: [
       { key: 'showHeader', label: 'Show Header', type: 'boolean', defaultValue: true },
       { key: 'showAvatar', label: 'Show Avatars', type: 'boolean', defaultValue: true },
       { key: 'showInput', label: 'Show Input', type: 'boolean', defaultValue: true },
       { key: 'showTimestamps', label: 'Show Timestamps', type: 'boolean', defaultValue: false },
-      { key: 'showMic', label: 'Show Mic Button', type: 'boolean', defaultValue: true },
+      { key: 'showMic', label: 'Mic (Voice Input)', type: 'boolean', defaultValue: true },
+      { key: 'showFeedback', label: 'Feedback (Copy/Thumbs/Regen)', type: 'boolean', defaultValue: true },
+      { key: 'showWebSearch', label: 'Web Search Toggle', type: 'boolean', defaultValue: true },
+      { key: 'showNewChat', label: 'New Chat Button', type: 'boolean', defaultValue: true },
+      { key: 'showConfigButton', label: 'Config Popover', type: 'boolean', defaultValue: true },
     ],
   },
 ]

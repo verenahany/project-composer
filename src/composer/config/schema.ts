@@ -27,6 +27,10 @@ export interface ChatbotConfig {
     showInput: boolean
     showTimestamps: boolean
     showMic: boolean
+    showFeedback: boolean
+    showWebSearch: boolean
+    showNewChat: boolean
+    showConfigButton: boolean
   }
 }
 
@@ -74,6 +78,10 @@ export function createDefaultConfig(): ProjectConfig {
         showInput: true,
         showTimestamps: true,
         showMic: false,
+        showFeedback: false,
+        showWebSearch: false,
+        showNewChat: false,
+        showConfigButton: false,
       },
     },
     icons: { ...DEFAULT_ICONS },

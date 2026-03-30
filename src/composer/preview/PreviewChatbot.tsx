@@ -5,7 +5,11 @@
  */
 
 import type { FC } from 'react'
-import { MessageCircle, Send, Bot, User, MicOff } from 'lucide-react'
+import {
+  MessageCircle, Send, Bot, User, MicOff,
+  Copy, ThumbsUp, ThumbsDown, RefreshCcw,
+  Globe, Settings2, MessageSquarePlus,
+} from 'lucide-react'
 import type { ChatbotConfig } from '../config/schema'
 
 interface Props {
@@ -150,7 +154,7 @@ function PresentationChat({ chatbotConfig }: Props) {
   ]
 
   return (
-    <div className="prev-chat prev-chat--presentation">
+    <div className="pres-chat">
       {props.showHeader && (
         <div className="prev-chat__header">
           <Bot size={16} />
@@ -158,46 +162,91 @@ function PresentationChat({ chatbotConfig }: Props) {
           <span className="prev-chat__status-dot" />
         </div>
       )}
-      <div className="prev-chat__messages">
+
+      {/* Messages area — faithful to PresentationDashboard */}
+      <div className="pres-chat__messages">
         {presMessages.map((msg) => (
-          <div key={msg.id} className={`prev-chat__row prev-chat__row--${msg.role}`}>
+          <div
+            key={msg.id}
+            className={`pres-chat__msg ${msg.role === 'user' ? 'pres-chat__msg--user' : 'pres-chat__msg--assistant'}`}
+          >
             {props.showAvatar && (
-              <span className={`prev-chat__avatar prev-chat__avatar--${msg.role === 'assistant' ? 'bot' : 'user'}`}>
-                {msg.role === 'assistant' ? <Bot size={14} /> : <User size={14} />}
+              <span className={`pres-chat__avatar ${msg.role === 'user' ? 'pres-chat__avatar--user' : 'pres-chat__avatar--bot'}`}>
+                {msg.role === 'assistant' ? <Bot size={13} /> : <User size={13} />}
               </span>
             )}
-            <div className={`prev-chat__bubble prev-chat__bubble--${msg.role}`}>
-              <p>{msg.text}</p>
+            <div className={`pres-chat__content ${msg.role === 'user' ? 'pres-chat__content--user' : 'pres-chat__content--assistant'}`}>
+              <div className={`pres-chat__bubble ${msg.role === 'user' ? 'pres-chat__bubble--user' : 'pres-chat__bubble--assistant'}`}>
+                <p>{msg.text}</p>
+              </div>
+              {/* Feedback actions on messages — from PresentationDashboard */}
+              {props.showFeedback && msg.role === 'user' && (
+                <div className="pres-chat__actions pres-chat__actions--end">
+                  <button className="pres-chat__action-btn" title="Copy"><Copy size={11} /></button>
+                </div>
+              )}
+              {props.showFeedback && msg.role === 'assistant' && (
+                <div className="pres-chat__actions">
+                  <button className="pres-chat__action-btn" title="Copy"><Copy size={11} /></button>
+                  <button className="pres-chat__action-btn" title="Good response"><ThumbsUp size={11} /></button>
+                  <button className="pres-chat__action-btn" title="Bad response"><ThumbsDown size={11} /></button>
+                  <button className="pres-chat__action-btn" title="Regenerate"><RefreshCcw size={11} /></button>
+                </div>
+              )}
             </div>
           </div>
         ))}
-        {/* Streaming dots */}
-        <div className="prev-chat__row prev-chat__row--assistant">
+
+        {/* Streaming dots — typing indicator */}
+        <div className="pres-chat__msg pres-chat__msg--assistant">
           {props.showAvatar && (
-            <span className="prev-chat__avatar prev-chat__avatar--bot"><Bot size={14} /></span>
+            <span className="pres-chat__avatar pres-chat__avatar--bot"><Bot size={13} /></span>
           )}
-          <div className="prev-chat__bubble prev-chat__bubble--assistant prev-chat__bubble--typing">
-            <span className="prev-chat__dots"><span /><span /><span /></span>
+          <div className="pres-chat__content pres-chat__content--assistant">
+            <div className="pres-chat__bubble pres-chat__bubble--assistant pres-chat__bubble--typing">
+              <span className="pres-chat__dots"><span /><span /><span /></span>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Input bar — faithful to PresentationInput (minimalChatInput mode) */}
       {props.showInput && (
-        <div className="prev-chat__pres-input-bar">
+        <div className="pres-chat__input-wrap">
           <textarea
-            className="prev-chat__pres-textarea"
-            placeholder="Message AI..."
+            className="pres-chat__textarea"
+            placeholder="Message Presentation AI..."
             rows={1}
             readOnly
           />
-          <div className="prev-chat__pres-actions">
-            {props.showMic && (
-              <button className="prev-chat__pres-mic" title="Voice input">
-                <MicOff size={14} />
+          <div className="pres-chat__toolbar">
+            {props.showConfigButton && (
+              <button className="pres-chat__tool-btn" title="Chat config">
+                <Settings2 size={13} />
               </button>
             )}
-            <button className="prev-chat__pres-send" title="Send">
-              <Send size={14} />
-            </button>
+            {props.showWebSearch && (
+              <button className="pres-chat__tool-btn pres-chat__tool-btn--web" title="Web search">
+                <Globe size={13} />
+                <span>Web</span>
+              </button>
+            )}
+            <div className="pres-chat__toolbar-right">
+              {props.showNewChat && (
+                <button className="pres-chat__new-chat-btn" title="New chat">
+                  <MessageSquarePlus size={12} />
+                  <span>New chat</span>
+                </button>
+              )}
+              {props.showMic && (
+                <button className="pres-chat__circle-btn" title="Voice input">
+                  <MicOff size={13} />
+                </button>
+              )}
+              <button className="pres-chat__circle-btn" title="Send">
+                <Send size={13} />
+              </button>
+            </div>
           </div>
         </div>
       )}
